@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="https://raw.githubusercontent.com/anthonymengottii/upay-sdks/main/logo/light.png" alt="Upay Logo" width="200"/>
+</div>
+
 # Upay SDKs
 
 SDKs oficiais da Upay para facilitar a integração da plataforma de pagamentos em diferentes linguagens de programação.

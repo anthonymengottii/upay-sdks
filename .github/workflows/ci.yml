@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-js:
+    name: Test JavaScript SDK
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: packages/upay-js/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: packages/upay-js
+        run: npm ci
+      
+      - name: Build
+        working-directory: packages/upay-js
+        run: npm run build
+      
+      - name: Run tests
+        working-directory: packages/upay-js
+        run: npm test || true

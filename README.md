@@ -3,7 +3,7 @@
   
   #SDKs oficiais da Upay - Integração facilitada
   
-  [![Documentation](https://img.shields.io/badge/Documentation-Live-brightgreen)](https://docs.upay.com.br)
+  [![Documentation](https://img.shields.io/badge/Documentation-Live-brightgreen)](https://docs.upay.com)
   [![API Version](https://img.shields.io/badge/API-v1.0-blue)](https://upay-sistema-api.onrender.com)
   [![License](https://img.shields.io/badge/License-MIT-purple)](LICENSE)
   
@@ -11,8 +11,6 @@
   
   SDKs oficiais da Upay para facilitar a integração da plataforma de pagamentos em diferentes linguagens de programação.
 </div>
-
-## 📦 SDKs Disponíveis
 
 ### ✅ JavaScript/TypeScript
 - **Pacote**: `@upay/upay-js`

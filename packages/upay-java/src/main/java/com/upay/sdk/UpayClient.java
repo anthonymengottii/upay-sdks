@@ -20,7 +20,7 @@ public class UpayClient {
         if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalArgumentException("API Key é obrigatória");
         }
-        String url = baseUrl != null ? baseUrl : "https://api.upay-sistema.onrender.com";
+        String url = baseUrl != null ? baseUrl : "https://upay-sistema-api.onrender.com";
         this.http = new HttpClientWrapper(apiKey, url, version, timeoutSeconds);
 
         this.paymentLinks = new PaymentLinksResource(http);

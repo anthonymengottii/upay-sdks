@@ -1,7 +1,3 @@
-<div align="center">
-  <img src="https://raw.githubusercontent.com/anthonymengottii/upay-sdks/main/logo/light.png" alt="Upay Logo" width="200"/>
-</div>
-
 # Upay SDKs
 
 SDKs oficiais da Upay para facilitar a integração da plataforma de pagamentos em diferentes linguagens de programação.
@@ -45,7 +41,7 @@ import UpayClient from '@upay/upay-js';
 
 const upay = new UpayClient({
   apiKey: 'sua_api_key_aqui',
-  baseUrl: 'https://api.upay-sistema.onrender.com', // Opcional
+  baseUrl: 'https://upay-sistema-api.onrender.com', // Opcional
 });
 
 // Criar um link de pagamento

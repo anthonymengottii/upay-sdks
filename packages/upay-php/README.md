@@ -202,7 +202,7 @@ if ($upay->verifyWebhookSignature($payload, $signature, $secret)) {
 ```php
 $upay = new UpayClient(
     apiKey: "sua_api_key",
-    baseUrl: "https://api.upay-sistema.onrender.com",  // Opcional
+    baseUrl: "https://https://upay-sistema-api.onrender.com/",  // Opcional
     version: "v1",  // Opcional
     timeout: 30  // Opcional, em segundos
 );

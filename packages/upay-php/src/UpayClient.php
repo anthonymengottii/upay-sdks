@@ -32,7 +32,7 @@ class UpayClient
         
         $this->http = new HttpClient(
             $apiKey,
-            $baseUrl ?? 'https://api.upay-sistema.onrender.com',
+            $baseUrl ?? 'https://https://upay-sistema-api.onrender.com/',
             $version,
             $timeout
         );

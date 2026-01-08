@@ -14,7 +14,7 @@ from upay import UpayClient
 API_KEY = "sua_api_key"
 
 # Base URL - usar localhost para desenvolvimento
-BASE_URL = os.getenv("UPAY_BASE_URL", "https://api.upay-sistema.onrender.com")
+BASE_URL = os.getenv("UPAY_BASE_URL", "https://upay-sistema-api.onrender.com")
 
 def test_sdk():
     """Testa o SDK Upay Python"""

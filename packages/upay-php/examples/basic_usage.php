@@ -11,7 +11,7 @@ use Upay\UpayClient;
 // Inicializar o cliente
 $upay = new UpayClient(
     apiKey: "sua_api_key_aqui",
-    baseUrl: "https://api.upay-sistema.onrender.com" 
+    baseUrl: "https://upay-sistema-api.onrender.com" 
 );
 
 echo "=== Exemplo: Payment Links ===\n\n";

@@ -7,7 +7,7 @@ from upay import UpayClient
 # Inicializar o cliente
 upay = UpayClient(
     api_key="sua_api_key_aqui",
-    base_url="https://api.upay-sistema.onrender.com" 
+    base_url="https://upay-sistema-api.onrender.com" 
 )
 
 def exemplo_payment_links():

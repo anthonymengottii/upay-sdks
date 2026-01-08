@@ -50,7 +50,7 @@ export class HttpClient {
 
   constructor(config: UpayConfig) {
     this.apiKey = config.apiKey;
-    this.baseUrl = config.baseUrl || 'https://api.upay-sistema.onrender.com';
+    this.baseUrl = config.baseUrl || 'https://upay-sistema-api.onrender.com';
     this.version = config.version || 'v1';
     this.defaultTimeout = config.timeout || 30000; // 30 segundos
   }

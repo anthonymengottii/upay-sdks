@@ -25,7 +25,7 @@ mvn compile
 import com.upay.sdk.UpayClient;
 
 String apiKey = "SUA_API_KEY_AQUI";
-String baseUrl = "https://api.upay-sistema.onrender.com"; // ou http://localhost:3001 em dev
+String baseUrl = "https://upay-sistema-api.onrender.com";
 
 UpayClient upay = new UpayClient(apiKey, baseUrl, "v1", 30);
 `
@@ -104,7 +104,7 @@ if (!valid) {
 Já existe um exemplo em src/main/java/com/upay/sdk/examples/Main.java que:
 
 - Usa sua API Key de teste
-- Aponta para http://localhost:3001
+- Aponta para https://upay-sistema-api.onrender.com
 - Lista Payment Links e Produtos
 
 Para executar:

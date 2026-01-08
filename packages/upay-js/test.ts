@@ -29,7 +29,7 @@ async function testSDK() {
   // Inicializar cliente
   const config: UpayConfig = {
     apiKey: apiKey,
-    baseUrl: process.env.UPAY_BASE_URL || 'https://api.upay-sistema.onrender.com',
+    baseUrl: process.env.UPAY_BASE_URL || 'https://https://upay-sistema-api.onrender.com/',
     version: 'v1',
     timeout: 30000,
   };

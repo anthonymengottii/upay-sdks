@@ -30,7 +30,7 @@ class Coupons
         }
         
         // Endpoint público em /api/coupons/validate (sem /v1)
-        $baseUrl = $this->http->baseUrl ?? 'https://api.upay-sistema.onrender.com';
+        $baseUrl = $this->http->baseUrl ?? 'https://upay-sistema-api.onrender.com';
         $url = "{$baseUrl}/api/coupons/validate";
         
         // Faz requisição sem autenticação usando cURL

@@ -13,7 +13,7 @@ public class Main {
         }
         String baseUrl = System.getenv("UPAY_BASE_URL");
         if (baseUrl == null || baseUrl.isBlank()) {
-            baseUrl = "https://api.upay-sistema.onrender.com";
+            baseUrl = "https://upay-sistema-api.onrender.com";
         }
 
         System.out.println("Testando SDK Upay Java...\n");

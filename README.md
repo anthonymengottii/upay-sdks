@@ -1,9 +1,16 @@
-# Upay SDKs
-
-SDKs oficiais da Upay para facilitar a integração da plataforma de pagamentos em diferentes linguagens de programação.
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![npm version](https://img.shields.io/npm/v/@upay/upay-js.svg)](https://www.npmjs.com/package/@upay/upay-js)
+<div align="center">
+  <img src="logo/light.png" alt="SDKs oficiais da Upay" width="200" />
+  
+  #SDKs oficiais da Upay - Integração facilitada
+  
+  [![Documentation](https://img.shields.io/badge/Documentation-Live-brightgreen)](https://docs.upay.com.br)
+  [![API Version](https://img.shields.io/badge/API-v1.0-blue)](https://upay-sistema-api.onrender.com)
+  [![License](https://img.shields.io/badge/License-MIT-purple)](LICENSE)
+  
+  **Documentação oficial e completa da API UPay Gateway**
+  
+  SDKs oficiais da Upay para facilitar a integração da plataforma de pagamentos em diferentes linguagens de programação.
+</div>
 
 ## 📦 SDKs Disponíveis
 

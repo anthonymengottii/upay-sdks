@@ -22,7 +22,23 @@ export class ProductsResource {
       throw new Error('Nome do produto é obrigatório');
     }
 
-    if (!data.priceCents || data.priceCents < 100) {
+    // Validação de priceCents: verificar se é obrigatório
+    if (data.priceCents === undefined || data.priceCents === null) {
+      throw new Error('Preço é obrigatório');
+    }
+
+    // Verificar se é um número
+    if (typeof data.priceCents !== 'number' || !Number.isFinite(data.priceCents)) {
+      throw new Error('Preço deve ser um número válido');
+    }
+
+    // Verificar se não é negativo
+    if (data.priceCents < 0) {
+      throw new Error('Preço não pode ser negativo');
+    }
+
+    // Verificar valor mínimo
+    if (data.priceCents < 100) {
       throw new Error('Preço mínimo é R$ 1,00 (100 centavos)');
     }
 
@@ -66,8 +82,22 @@ export class ProductsResource {
       throw new Error('ID é obrigatório');
     }
 
-    if (data.priceCents !== undefined && data.priceCents < 100) {
-      throw new Error('Preço mínimo é R$ 1,00 (100 centavos)');
+    // Validação de priceCents no update: verificar apenas se foi fornecido
+    if (data.priceCents !== undefined && data.priceCents !== null) {
+      // Verificar se é um número
+      if (typeof data.priceCents !== 'number' || !Number.isFinite(data.priceCents)) {
+        throw new Error('Preço deve ser um número válido');
+      }
+
+      // Verificar se não é negativo
+      if (data.priceCents < 0) {
+        throw new Error('Preço não pode ser negativo');
+      }
+
+      // Verificar valor mínimo
+      if (data.priceCents < 100) {
+        throw new Error('Preço mínimo é R$ 1,00 (100 centavos)');
+      }
     }
 
     return this.http.patch<Product>(`/products/${id}`, data);

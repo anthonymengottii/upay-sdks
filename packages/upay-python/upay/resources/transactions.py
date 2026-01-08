@@ -12,6 +12,19 @@ class TransactionsResource:
     def __init__(self, http: HttpClient):
         self.http = http
     
+    def _validate_transaction_id(self, transaction_id: str) -> None:
+        """
+        Valida se o ID da transação foi fornecido
+        
+        Args:
+            transaction_id: ID da transação a validar
+            
+        Raises:
+            ValueError: Se transaction_id for vazio ou None
+        """
+        if not transaction_id:
+            raise ValueError("ID é obrigatório")
+    
     def create(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Cria uma nova transação
@@ -98,8 +111,7 @@ class TransactionsResource:
         Returns:
             Transação
         """
-        if not transaction_id:
-            raise ValueError("ID é obrigatório")
+        self._validate_transaction_id(transaction_id)
         
         return self.http.get(f"/transactions/{transaction_id}")
     
@@ -118,8 +130,7 @@ class TransactionsResource:
         Returns:
             Transação processada
         """
-        if not transaction_id:
-            raise ValueError("ID é obrigatório")
+        self._validate_transaction_id(transaction_id)
         
         return self.http.post(f"/transactions/{transaction_id}/process", payment_data)
     
@@ -133,8 +144,7 @@ class TransactionsResource:
         Returns:
             Transação capturada
         """
-        if not transaction_id:
-            raise ValueError("ID é obrigatório")
+        self._validate_transaction_id(transaction_id)
         
         return self.http.post(f"/transactions/{transaction_id}/capture")
     
@@ -148,8 +158,7 @@ class TransactionsResource:
         Returns:
             Transação cancelada
         """
-        if not transaction_id:
-            raise ValueError("ID é obrigatório")
+        self._validate_transaction_id(transaction_id)
         
         return self.http.post(f"/transactions/{transaction_id}/cancel")
     
@@ -168,8 +177,7 @@ class TransactionsResource:
         Returns:
             Transação estornada
         """
-        if not transaction_id:
-            raise ValueError("ID é obrigatório")
+        self._validate_transaction_id(transaction_id)
         
         data = {}
         if amount_cents is not None:

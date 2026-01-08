@@ -34,7 +34,8 @@ interface BaseCreatePaymentLinkRequest {
 }
 
 export interface CreatePaymentLinkWithAmountRequest extends BaseCreatePaymentLinkRequest {
-  amount: number; // em centavos
+  /** Amount in cents (integer) */
+  amount: number;
   products?: never;
 }
 
@@ -53,7 +54,8 @@ export type CreatePaymentLinkRequest =
 export interface UpdatePaymentLinkRequest {
   title?: string;
   description?: string;
-  amount?: number; // em centavos
+  /** Amount in cents (integer) */
+  amount?: number;
   status?: 'ACTIVE' | 'INACTIVE';
   expiresAt?: Date | string;
   redirectUrl?: string;
@@ -65,8 +67,10 @@ export interface PaymentLink {
   slug: string;
   title: string;
   description?: string;
-  amount: number;
+  /** Amount in cents (integer). This is the canonical field for monetary values. */
   amountCents: number;
+  /** Amount in the currency unit (floating-point). Deprecated: use amountCents instead. */
+  amount: number;
   currency: string;
   status: 'ACTIVE' | 'INACTIVE';
   expiresAt?: string;
@@ -85,10 +89,13 @@ export interface PaymentLink {
   }>;
 }
 
+/** Payment method types supported by the API */
+export type PaymentMethod = 'PIX' | 'CREDIT_CARD' | 'BOLETO';
+
 export interface CreateTransactionRequest {
   product: string;
   amountCents: number;
-  paymentMethod?: 'PIX' | 'CREDIT_CARD' | 'BOLETO';
+  paymentMethod?: PaymentMethod;
   clientId?: string;
   client?: {
     name: string;
@@ -107,7 +114,7 @@ export interface Transaction {
   product: string;
   amountCents: number;
   status: 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
-  paymentMethod: string;
+  paymentMethod: PaymentMethod;
   client?: {
     id: string;
     name: string;
@@ -219,4 +226,22 @@ export interface CreateClientRequest {
   email: string;
   document?: string;
   phone?: string;
+}
+
+/**
+ * Dados do cartão de crédito para processamento de pagamento
+ */
+export interface CardData {
+  /** Número do cartão (sem espaços ou traços) */
+  number: string;
+  /** Nome do portador do cartão */
+  holderName?: string;
+  /** Mês de expiração (1-12 ou string "01"-"12") */
+  expiryMonth: string | number;
+  /** Ano de expiração (4 dígitos ou string "2024") */
+  expiryYear: string | number;
+  /** Código de segurança (CVV) */
+  cvv: string;
+  /** Bandeira do cartão (opcional, pode ser detectada automaticamente) */
+  brand?: string;
 }

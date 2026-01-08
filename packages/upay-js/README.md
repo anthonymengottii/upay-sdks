@@ -22,7 +22,7 @@ import UpayClient from '@upay/upay-js';
 const upay = new UpayClient({
   apiKey: 'sua_api_key_aqui',
   // Opcional: customizar URL base
-  // baseUrl: 'https://https://upay-sistema-api.onrender.com/',
+  // baseUrl: 'https://upay-sistema-api.onrender.com/',
   // version: 'v1',
 });
 ```
@@ -213,7 +213,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
 ```typescript
 const upay = new UpayClient({
   apiKey: 'sua_api_key',        // Obrigatório
-  baseUrl: 'https://...',        // Opcional (padrão: https://https://upay-sistema-api.onrender.com/)
+  baseUrl: 'https://upay-sistema-api.onrender.com/',  // Opcional (padrão: https://upay-sistema-api.onrender.com/)
   version: 'v1',                 // Opcional (padrão: 'v1')
   timeout: 30000,               // Opcional (padrão: 30000ms)
 });

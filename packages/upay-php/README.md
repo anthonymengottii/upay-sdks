@@ -3,7 +3,7 @@
 SDK oficial da Upay para PHP - Integração fácil com a API de pagamentos.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PHP 7.4+](https://img.shields.io/badge/php-7.4+-blue.svg)](https://www.php.net/downloads)
+[![PHP 8.0+](https://img.shields.io/badge/php-8.0+-blue.svg)](https://www.php.net/downloads)
 
 ## 📦 Instalação
 

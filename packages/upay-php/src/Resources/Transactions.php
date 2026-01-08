@@ -13,6 +13,22 @@ class Transactions
         $this->http = $http;
     }
     
+    /**
+     * Valida e codifica o ID da transação
+     * 
+     * @param string $id ID da transação
+     * @return string ID codificado para URL
+     * @throws \InvalidArgumentException Se o ID for inválido
+     */
+    private function validateAndEncodeId(string $id): string
+    {
+        if (trim($id) === '') {
+            throw new \InvalidArgumentException('ID é obrigatório');
+        }
+        
+        return rawurlencode($id);
+    }
+    
     public function create(array $data): array
     {
         // Validação básica
@@ -43,51 +59,37 @@ class Transactions
     
     public function get(string $id): array
     {
-        if (empty($id)) {
-            throw new \InvalidArgumentException('ID é obrigatório');
-        }
-        
-        return $this->http->get("/transactions/{$id}");
+        $encodedId = $this->validateAndEncodeId($id);
+        return $this->http->get("/transactions/{$encodedId}");
     }
     
     public function process(string $id, ?array $paymentData = null): array
     {
-        if (empty($id)) {
-            throw new \InvalidArgumentException('ID é obrigatório');
-        }
-        
-        return $this->http->post("/transactions/{$id}/process", $paymentData);
+        $encodedId = $this->validateAndEncodeId($id);
+        return $this->http->post("/transactions/{$encodedId}/process", $paymentData);
     }
     
     public function capture(string $id): array
     {
-        if (empty($id)) {
-            throw new \InvalidArgumentException('ID é obrigatório');
-        }
-        
-        return $this->http->post("/transactions/{$id}/capture");
+        $encodedId = $this->validateAndEncodeId($id);
+        return $this->http->post("/transactions/{$encodedId}/capture");
     }
     
     public function cancel(string $id): array
     {
-        if (empty($id)) {
-            throw new \InvalidArgumentException('ID é obrigatório');
-        }
-        
-        return $this->http->post("/transactions/{$id}/cancel");
+        $encodedId = $this->validateAndEncodeId($id);
+        return $this->http->post("/transactions/{$encodedId}/cancel");
     }
     
     public function refund(string $id, ?int $amountCents = null): array
     {
-        if (empty($id)) {
-            throw new \InvalidArgumentException('ID é obrigatório');
-        }
+        $encodedId = $this->validateAndEncodeId($id);
         
         $data = [];
         if ($amountCents !== null) {
             $data['amountCents'] = $amountCents;
         }
         
-        return $this->http->post("/transactions/{$id}/refund", $data);
+        return $this->http->post("/transactions/{$encodedId}/refund", $data);
     }
 }

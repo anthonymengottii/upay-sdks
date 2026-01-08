@@ -22,10 +22,33 @@ public class HttpClientWrapper {
     private final ObjectMapper mapper = new ObjectMapper();
 
     public HttpClientWrapper(String apiKey, String baseUrl, String version, int timeoutSeconds) {
+        // Validate apiKey
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("API key is required");
+        }
         this.apiKey = apiKey;
-        this.baseUrl = baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
-        this.version = version != null ? version : "v1";
-        this.timeoutSeconds = timeoutSeconds > 0 ? timeoutSeconds : 30;
+        
+        // Validate baseUrl
+        if (baseUrl == null || baseUrl.trim().isEmpty()) {
+            throw new IllegalArgumentException("Base URL is required");
+        }
+        String trimmedBaseUrl = baseUrl.trim();
+        this.baseUrl = trimmedBaseUrl.endsWith("/") ? trimmedBaseUrl.substring(0, trimmedBaseUrl.length() - 1) : trimmedBaseUrl;
+        
+        // Validate and set version
+        if (version == null || version.trim().isEmpty()) {
+            this.version = "v1";
+        } else {
+            this.version = version.trim();
+        }
+        
+        // Validate and set timeoutSeconds
+        if (timeoutSeconds <= 0) {
+            this.timeoutSeconds = 30;
+        } else {
+            this.timeoutSeconds = timeoutSeconds;
+        }
+        
         this.client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(this.timeoutSeconds))
                 .build();
@@ -49,6 +72,59 @@ public class HttpClientWrapper {
 
     public JsonNode delete(String endpoint) throws IOException, InterruptedException {
         return request("DELETE", endpoint, null, null);
+    }
+
+    public JsonNode postPublic(String endpoint, Map<String, Object> body) throws IOException, InterruptedException {
+        return requestPublic("POST", endpoint, body, null);
+    }
+
+    private JsonNode requestPublic(String method, String endpoint, Map<String, Object> body, Map<String, Object> params)
+            throws IOException, InterruptedException {
+
+        StringBuilder url = new StringBuilder(baseUrl)
+                .append(endpoint.startsWith("/") ? endpoint : "/" + endpoint);
+
+        if (params != null && !params.isEmpty()) {
+            String query = params.entrySet().stream()
+                    .filter(e -> e.getValue() != null)
+                    .map(e -> e.getKey() + "=" + e.getValue())
+                    .reduce((a, b) -> a + "&" + b)
+                    .orElse("");
+            if (!query.isEmpty()) url.append("?").append(query);
+        }
+
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(URI.create(url.toString()))
+                .timeout(Duration.ofSeconds(timeoutSeconds))
+                .header("Content-Type", "application/json")
+                .header("User-Agent", "Upay-Java-SDK/1.0.0");
+
+        if (body != null) {
+            builder.method(method, HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)));
+        } else {
+            builder.method(method, HttpRequest.BodyPublishers.noBody());
+        }
+
+        HttpResponse<String> response = client.send(builder.build(), HttpResponse.BodyHandlers.ofString());
+        int status = response.statusCode();
+        String respBody = response.body();
+
+        JsonNode json;
+        try {
+            json = respBody != null && !respBody.isEmpty()
+                    ? mapper.readTree(respBody)
+                    : mapper.createObjectNode();
+        } catch (Exception e) {
+            json = mapper.createObjectNode();
+        }
+
+        if (status >= 400) {
+            String message = json.path("message").asText("HTTP " + status);
+            String code = json.path("code").asText(null);
+            throw new UpayException(message, code, status);
+        }
+
+        return json;
     }
 
     private JsonNode request(String method, String endpoint, Map<String, Object> body, Map<String, Object> params)

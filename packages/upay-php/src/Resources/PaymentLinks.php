@@ -24,8 +24,15 @@ class PaymentLinks
             throw new \InvalidArgumentException('É necessário fornecer amount ou products');
         }
         
-        if (!empty($data['amount']) && $data['amount'] < 100) {
-            throw new \InvalidArgumentException('Valor mínimo é R$ 1,00 (100 centavos)');
+        // Validação robusta de amount: garantir que seja numérico e respeite o mínimo
+        if (isset($data['amount'])) {
+            if (!is_numeric($data['amount'])) {
+                throw new \InvalidArgumentException('Amount deve ser numérico');
+            }
+            $amount = (int) $data['amount'];
+            if ($amount < 100) {
+                throw new \InvalidArgumentException('Valor mínimo é R$ 1,00 (100 centavos)');
+            }
         }
         
         $requestData = [
@@ -63,11 +70,12 @@ class PaymentLinks
     
     public function get(string $id): array
     {
-        if (empty($id)) {
+        if (trim($id) === '') {
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
-        $response = $this->http->get("/payment-links/{$id}");
+        $encodedId = rawurlencode($id);
+        $response = $this->http->get("/payment-links/{$encodedId}");
         
         return $response['paymentLink'] ?? $response['data'] ?? $response;
     }
@@ -78,15 +86,17 @@ class PaymentLinks
             throw new \InvalidArgumentException('Slug é obrigatório');
         }
         
-        return $this->http->get("/payment-links/slug/{$slug}");
+        $encodedSlug = rawurlencode($slug);
+        return $this->http->get("/payment-links/slug/{$encodedSlug}");
     }
     
     public function update(string $id, array $data): array
     {
-        if (empty($id)) {
+        if (trim($id) === '') {
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
+        $encodedId = rawurlencode($id);
         $updateData = [];
         if (isset($data['title'])) $updateData['title'] = $data['title'];
         if (isset($data['description'])) $updateData['description'] = $data['description'];
@@ -96,16 +106,17 @@ class PaymentLinks
         if (isset($data['redirectUrl'])) $updateData['redirectUrl'] = $data['redirectUrl'];
         if (isset($data['settings'])) $updateData['settings'] = $data['settings'];
         
-        return $this->http->patch("/payment-links/{$id}", $updateData);
+        return $this->http->patch("/payment-links/{$encodedId}", $updateData);
     }
     
     public function delete(string $id): void
     {
-        if (empty($id)) {
+        if (trim($id) === '') {
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
-        $this->http->delete("/payment-links/{$id}");
+        $encodedId = rawurlencode($id);
+        $this->http->delete("/payment-links/{$encodedId}");
     }
     
     public function getCheckoutUrl(string $slug, ?string $baseUrl = null): string

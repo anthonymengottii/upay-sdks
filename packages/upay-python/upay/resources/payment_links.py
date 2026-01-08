@@ -3,6 +3,7 @@ Recurso de Payment Links
 """
 
 from typing import Optional, Dict, Any
+from urllib.parse import quote
 from ..http import HttpClient
 
 
@@ -11,6 +12,18 @@ class PaymentLinksResource:
     
     def __init__(self, http: HttpClient):
         self.http = http
+    
+    def _normalize_payment_link_response(self, response: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Normaliza a resposta da API para retornar o PaymentLink de forma consistente
+        
+        Args:
+            response: Resposta bruta da API
+            
+        Returns:
+            PaymentLink normalizado
+        """
+        return response.get("paymentLink") or response.get("data") or response
     
     def create(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -32,14 +45,27 @@ class PaymentLinksResource:
             Link de pagamento criado
         """
         # Validação básica
-        if not data.get("title") or len(data["title"].strip()) < 3:
+        title = data.get("title")
+        if not isinstance(title, str) or len(title.strip()) < 3:
             raise ValueError("Título deve ter pelo menos 3 caracteres")
         
         if not data.get("amount") and not data.get("products"):
             raise ValueError("É necessário fornecer amount ou products")
         
-        if data.get("amount") and data.get("amount", 0) < 100:
-            raise ValueError("Valor mínimo é R$ 1,00 (100 centavos)")
+        # Validação robusta de amount
+        if "amount" in data:
+            amount = data["amount"]
+            # Verificar se é numérico
+            if not isinstance(amount, (int, float)):
+                raise ValueError("Amount deve ser um número")
+            # Converter para int se for float
+            amount = int(amount)
+            # Verificar se não é negativo
+            if amount < 0:
+                raise ValueError("Valor não pode ser negativo")
+            # Verificar valor mínimo
+            if amount < 100:
+                raise ValueError("Valor mínimo é R$ 1,00 (100 centavos)")
         
         # Prepara dados para envio
         request_data = {
@@ -63,7 +89,7 @@ class PaymentLinksResource:
         response = self.http.post("/payment-links", request_data)
         
         # Mapear resposta: { message, data } -> retornar data
-        return response.get("data") or response
+        return self._normalize_payment_link_response(response)
     
     def list(
         self,
@@ -121,7 +147,7 @@ class PaymentLinksResource:
         response = self.http.get(f"/payment-links/{link_id}")
         
         # Mapear resposta: { message, paymentLink } -> retornar paymentLink
-        return response.get("paymentLink") or response.get("data") or response
+        return self._normalize_payment_link_response(response)
     
     def get_by_slug(self, slug: str) -> Dict[str, Any]:
         """
@@ -136,7 +162,8 @@ class PaymentLinksResource:
         if not slug:
             raise ValueError("Slug é obrigatório")
         
-        return self.http.get(f"/payment-links/slug/{slug}")
+        response = self.http.get(f"/payment-links/slug/{slug}")
+        return self._normalize_payment_link_response(response)
     
     def update(self, link_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -169,7 +196,8 @@ class PaymentLinksResource:
         if "settings" in data:
             update_data["settings"] = data["settings"]
         
-        return self.http.patch(f"/payment-links/{link_id}", update_data)
+        response = self.http.patch(f"/payment-links/{link_id}", update_data)
+        return self._normalize_payment_link_response(response)
     
     def delete(self, link_id: str) -> None:
         """
@@ -194,5 +222,18 @@ class PaymentLinksResource:
         Returns:
             URL completa do checkout
         """
-        checkout_base = base_url or "https://checkout.upaybr.com"
-        return f"{checkout_base}/{slug}"
+        # Validar slug
+        if not slug or not isinstance(slug, str):
+            raise ValueError("Slug é obrigatório e deve ser uma string")
+        
+        slug = slug.strip()
+        if not slug:
+            raise ValueError("Slug não pode ser vazio")
+        
+        # Normalizar base_url (remover trailing slash)
+        checkout_base = (base_url or "https://checkout.upaybr.com").rstrip('/')
+        
+        # Codificar slug para URL
+        encoded_slug = quote(slug, safe='')
+        
+        return f"{checkout_base}/{encoded_slug}"

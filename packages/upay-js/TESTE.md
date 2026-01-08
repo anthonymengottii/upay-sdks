@@ -49,7 +49,7 @@ O script de teste (`test.ts`) executa os seguintes testes:
 🧪 Testando SDK Upay...
 
 📝 Configuração:
-   Base URL: https://https://upay-sistema-api.onrender.com/
+   Base URL: https://upay-sistema-api.onrender.com/
    Version: v1
    API Key: abc12345...
 

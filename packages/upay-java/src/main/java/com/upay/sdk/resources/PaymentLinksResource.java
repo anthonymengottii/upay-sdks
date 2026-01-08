@@ -33,7 +33,16 @@ public class PaymentLinksResource {
         if (amountCents != null) {
             body.put("amountCents", amountCents);
         }
-        if (options != null) body.putAll(options);
+        // Merge options, but skip keys that would overwrite validated fields
+        if (options != null) {
+            for (Map.Entry<String, Object> entry : options.entrySet()) {
+                String key = entry.getKey();
+                // Skip title and amountCents to prevent overwriting validated fields
+                if (!"title".equals(key) && !"amountCents".equals(key)) {
+                    body.put(key, entry.getValue());
+                }
+            }
+        }
 
         // Return full response for consistency
         return http.post("/payment-links", body);

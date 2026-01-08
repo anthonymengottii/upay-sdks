@@ -6,7 +6,7 @@ import json
 from typing import Any, Dict, Optional
 from urllib.parse import urlencode
 import requests
-from .utils.errors import handle_api_error
+from .utils.errors import handle_api_error, UpayRequestError
 
 
 class HttpClient:
@@ -39,6 +39,27 @@ class HttpClient:
             'Content-Type': 'application/json',
             'User-Agent': 'Upay-Python-SDK/1.0.0'
         })
+    
+    def close(self):
+        """Fecha a sessão HTTP"""
+        if hasattr(self, 'session') and self.session:
+            self.session.close()
+    
+    def __enter__(self):
+        """Context manager entry"""
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit - fecha a sessão"""
+        self.close()
+        return False
+    
+    def __del__(self):
+        """Destrutor - garante que a sessão seja fechada"""
+        try:
+            self.close()
+        except Exception:
+            pass  # Ignorar erros no destrutor
     
     def request(
         self,
@@ -92,7 +113,7 @@ class HttpClient:
             return body
             
         except requests.exceptions.RequestException as e:
-            raise Exception(f"Erro na requisição: {str(e)}")
+            raise UpayRequestError(f"Erro na requisição HTTP: {str(e)}") from e
     
     def get(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> Any:
         """Faz uma requisição GET"""

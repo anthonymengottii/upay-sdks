@@ -67,11 +67,11 @@ System.out.println(products.toPrettyString());
 
 ## 💳 Transações
 
-(Exposição de criação/processamento via API pública pode ser ajustada depois; por enquanto, foque em leitura/listagem)
+Transaction creation/processing is not supported in this SDK version; only read/list operations are available. For future implementation of transaction creation and processing, please refer to the [public API documentation](https://docs.upaybr.com) or check the SDK roadmap.
 
 `java
-JsonNode transactions = upay.transactions.list(1, 10);
-System.out.println(transactions.toPrettyString());
+TransactionListResponse transactions = upay.transactions.list(1, 10);
+System.out.println(transactions.getData().size() + " transactions found");
 `
 
 ## 🎫 Cupons

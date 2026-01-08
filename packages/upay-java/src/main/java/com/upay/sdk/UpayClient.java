@@ -18,9 +18,15 @@ public class UpayClient {
 
     public UpayClient(String apiKey, String baseUrl, String version, int timeoutSeconds) {
         if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalArgumentException("API Key é obrigatória");
+            throw new IllegalArgumentException("API key is required");
         }
-        String url = baseUrl != null ? baseUrl : "https://upay-sistema-api.onrender.com";
+        if (version == null || version.isBlank()) {
+            throw new IllegalArgumentException("Version is required");
+        }
+        if (timeoutSeconds <= 0) {
+            throw new IllegalArgumentException("Timeout must be a positive integer");
+        }
+        String url = (baseUrl != null && !baseUrl.trim().isEmpty()) ? baseUrl : "https://upay-sistema-api.onrender.com";
         this.http = new HttpClientWrapper(apiKey, url, version, timeoutSeconds);
 
         this.paymentLinks = new PaymentLinksResource(http);
@@ -34,6 +40,15 @@ public class UpayClient {
     }
 
     public boolean verifyWebhookSignature(String payload, String signature, String secret) {
+        if (payload == null) {
+            throw new IllegalArgumentException("Payload is required");
+        }
+        if (signature == null) {
+            throw new IllegalArgumentException("Signature is required");
+        }
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalArgumentException("Secret is required");
+        }
         return WebhookUtils.verifySignature(payload, signature, secret);
     }
 }

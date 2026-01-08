@@ -31,4 +31,4 @@ jobs:
       
       - name: Run tests
         working-directory: packages/upay-js
-        run: npm test || true
+        run: npm test

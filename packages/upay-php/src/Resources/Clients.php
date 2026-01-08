@@ -15,12 +15,22 @@ class Clients
     
     public function create(array $data): array
     {
-        // Validação básica
-        if (empty($data['name']) || strlen(trim($data['name'])) === 0) {
+        // Validação de tipo e valor para name
+        if (!isset($data['name']) || !is_string($data['name'])) {
+            throw new \InvalidArgumentException('Nome do cliente é obrigatório e deve ser uma string');
+        }
+        
+        $name = trim($data['name']);
+        if (strlen($name) === 0) {
             throw new \InvalidArgumentException('Nome do cliente é obrigatório');
         }
         
-        if (empty($data['email']) || !$this->isValidEmail($data['email'])) {
+        // Validação de tipo e valor para email
+        if (!isset($data['email']) || !is_string($data['email'])) {
+            throw new \InvalidArgumentException('Email é obrigatório e deve ser uma string');
+        }
+        
+        if (!$this->isValidEmail($data['email'])) {
             throw new \InvalidArgumentException('Email inválido');
         }
         
@@ -39,24 +49,36 @@ class Clients
     
     public function get(string $id): array
     {
-        if (empty($id)) {
+        // Validação estrita que aceita "0" como ID válido
+        // Como o parâmetro é tipado como string, apenas verificamos se está vazio após trim
+        if (trim($id) === '') {
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
-        return $this->http->get("/clients/{$id}");
+        $encodedId = rawurlencode($id);
+        return $this->http->get("/clients/{$encodedId}");
     }
     
     public function update(string $id, array $data): array
     {
-        if (empty($id)) {
+        // Validação estrita que aceita "0" como ID válido
+        // Como o parâmetro é tipado como string, apenas verificamos se está vazio após trim
+        if (trim($id) === '') {
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
-        if (isset($data['email']) && !$this->isValidEmail($data['email'])) {
-            throw new \InvalidArgumentException('Email inválido');
+        // Validação de tipo para email se fornecido
+        if (isset($data['email'])) {
+            if (!is_string($data['email'])) {
+                throw new \InvalidArgumentException('Email deve ser uma string');
+            }
+            if (!$this->isValidEmail($data['email'])) {
+                throw new \InvalidArgumentException('Email inválido');
+            }
         }
         
-        return $this->http->patch("/clients/{$id}", $data);
+        $encodedId = rawurlencode($id);
+        return $this->http->patch("/clients/{$encodedId}", $data);
     }
     
     private function isValidEmail(string $email): bool

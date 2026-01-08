@@ -8,6 +8,7 @@ import type {
   Transaction,
   PaginationParams,
   PaginatedResponse,
+  CardData,
 } from '../types';
 
 export class TransactionsResource {
@@ -73,7 +74,7 @@ export class TransactionsResource {
    * Processa o pagamento de uma transação
    */
   async process(id: string, paymentData?: {
-    cardData?: any;
+    cardData?: CardData;
     installments?: number;
   }): Promise<Transaction> {
     if (!id) {

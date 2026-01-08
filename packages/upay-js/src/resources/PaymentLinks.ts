@@ -15,6 +15,14 @@ export class PaymentLinksResource {
   constructor(private http: HttpClient) {}
 
   /**
+   * Mapeia a resposta da API para um PaymentLink
+   * @private
+   */
+  private mapPaymentLinkResponse(response: any): PaymentLink {
+    return response.paymentLink || response.data || response;
+  }
+
+  /**
    * Cria um novo link de pagamento
    */
   async create(data: CreatePaymentLinkRequest): Promise<PaymentLink> {
@@ -46,8 +54,7 @@ export class PaymentLinksResource {
       stockEnabled: data.stockEnabled,
     });
     
-    // Mapear resposta da API: { message, data } -> retornar data diretamente
-    return response.data || response;
+    return this.mapPaymentLinkResponse(response);
   }
 
   /**
@@ -78,8 +85,7 @@ export class PaymentLinksResource {
       throw new Error('ID é obrigatório');
     }
     const response = await this.http.get<any>(`/payment-links/${id}`);
-    // Mapear resposta da API: { message, paymentLink } -> retornar paymentLink
-    return response.paymentLink || response.data || response;
+    return this.mapPaymentLinkResponse(response);
   }
 
   /**
@@ -89,7 +95,8 @@ export class PaymentLinksResource {
     if (!slug) {
       throw new Error('Slug é obrigatório');
     }
-    return this.http.get<PaymentLink>(`/payment-links/slug/${slug}`);
+    const response = await this.http.get<any>(`/payment-links/slug/${slug}`);
+    return this.mapPaymentLinkResponse(response);
   }
 
   /**
@@ -109,7 +116,8 @@ export class PaymentLinksResource {
     if (data.redirectUrl !== undefined) updateData.redirectUrl = data.redirectUrl;
     if (data.settings !== undefined) updateData.settings = data.settings;
 
-    return this.http.patch<PaymentLink>(`/payment-links/${id}`, updateData);
+    const response = await this.http.patch<any>(`/payment-links/${id}`, updateData);
+    return this.mapPaymentLinkResponse(response);
   }
 
   /**
@@ -126,7 +134,18 @@ export class PaymentLinksResource {
    * Obtém a URL pública do checkout
    */
   getCheckoutUrl(slug: string, baseUrl?: string): string {
-    const checkoutBase = baseUrl || 'https://checkout.upaybr.com';
-    return `${checkoutBase}/${slug}`;
+    // Validar slug
+    if (!slug || typeof slug !== 'string' || slug.trim().length === 0) {
+      throw new Error('Slug é obrigatório e deve ser uma string não vazia');
+    }
+
+    // Normalizar baseUrl (remover trailing slash se existir)
+    const normalizedBaseUrl = (baseUrl || 'https://checkout.upaybr.com').trim().replace(/\/+$/, '');
+    
+    // Normalizar slug (remover leading slashes, trim, e URL-encode)
+    const normalizedSlug = slug.trim().replace(/^\/+/, '');
+    const encodedSlug = encodeURIComponent(normalizedSlug);
+    
+    return `${normalizedBaseUrl}/${encodedSlug}`;
   }
 }

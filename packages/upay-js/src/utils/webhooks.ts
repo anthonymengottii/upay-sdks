@@ -2,6 +2,33 @@
  * Utilitários para verificação de webhooks
  */
 
+// Detecta ambiente Node.js de forma robusta
+const isNode =
+  typeof process !== 'undefined' &&
+  !!(process as any).versions &&
+  !!(process as any).versions.node;
+
+// Função para obter implementação de crypto de forma bundler-friendly
+// Tenta usar Web Crypto API primeiro, depois fallback para Node crypto
+function getCrypto(): typeof import('crypto') | null {
+  // Tentar Web Crypto API primeiro (browser ou Node 19+)
+  // Nota: Web Crypto API não suporta HMAC SHA256 diretamente de forma simples,
+  // então precisamos usar Node crypto para HMAC
+  
+  // Node.js - usar require dinâmico dentro da função
+  // Bundlers modernos podem tree-shake isso se não for usado em builds browser
+  if (isNode) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      return require('crypto');
+    } catch {
+      return null;
+    }
+  }
+  
+  return null;
+}
+
 /**
  * Verifica a assinatura de um webhook usando HMAC SHA256
  * 
@@ -19,33 +46,36 @@ export function verifyWebhookSignature(
     return false;
   }
 
-  // Detecta ambiente Node.js de forma robusta
-  const isNode =
-    typeof process !== 'undefined' &&
-    !!(process as any).versions &&
-    !!(process as any).versions.node;
+  // Validação de formato hex da assinatura
+  // SHA256 produz hash de 32 bytes = 64 caracteres hex
+  const hexRegex = /^[0-9a-fA-F]+$/;
+  if (!hexRegex.test(signature) || signature.length !== 64) {
+    return false;
+  }
 
-  // Se estiver em Node.js, usa crypto
-  if (isNode) {
+  const cryptoImpl = getCrypto();
+  
+  // Se estiver em Node.js, usa crypto do Node
+  if (isNode && cryptoImpl) {
     try {
-      const crypto = require('crypto');
-      const hash = crypto
+      const hash = cryptoImpl
         .createHmac('sha256', secret)
         .update(payload)
         .digest('hex');
 
       // Comparação segura para prevenir timing attacks
-      const hashBuffer = Buffer.from(hash);
-      const signatureBuffer = Buffer.from(signature);
+      const hashBuffer = Buffer.from(hash, 'hex');
+      const signatureBuffer = Buffer.from(signature, 'hex');
 
-      // timingSafeEqual lança erro se os buffers tiverem tamanhos diferentes
+      // Verificar comprimentos antes de comparar
       if (hashBuffer.length !== signatureBuffer.length) {
         return false;
       }
 
-      return crypto.timingSafeEqual(hashBuffer, signatureBuffer);
+      return cryptoImpl.timingSafeEqual(hashBuffer, signatureBuffer);
     } catch (error) {
-      console.error('Erro ao verificar assinatura do webhook:', error);
+      // Sanitizar log de erro - não expor detalhes sensíveis ou stack traces
+      console.error('Error verifying webhook signature');
       return false;
     }
   }

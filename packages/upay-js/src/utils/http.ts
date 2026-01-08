@@ -8,16 +8,16 @@ import type { UpayConfig } from '../types';
 // Polyfill para fetch no Node.js < 18
 let fetchImpl: typeof fetch;
 if (typeof fetch === 'undefined') {
-  // Node.js < 18 - usar undici
-  try {
-    const undici = require('undici');
-    const { fetch: undiciFetch, Agent } = undici;
-    // Configurar agente com SSL mais permissivo para desenvolvimento
-    const agent = new Agent({
-      connect: {
-        rejectUnauthorized: process.env.NODE_ENV === 'production'
-      }
-    });
+    // Node.js < 18 - usar undici
+    try {
+      const undici = require('undici');
+      const { fetch: undiciFetch, Agent } = undici;
+      // Configurar agente com verificação TLS sempre habilitada
+      const agent = new Agent({
+        connect: {
+          rejectUnauthorized: true
+        }
+      });
     fetchImpl = ((url: any, options: any) => {
       return undiciFetch(url, {
         ...options,
@@ -171,8 +171,9 @@ export class HttpClient {
     if (typeof data === 'object') {
       const processed: any = {};
       for (const [key, value] of Object.entries(data)) {
-        // Converte amount para amountCents se necessário
+        // Converte amount para amountCents preservando ambos os campos
         if (key === 'amount' && typeof value === 'number') {
+          processed.amount = value;
           processed.amountCents = value;
         } else if (key === 'expiresAt' && value instanceof Date) {
           processed[key] = value.toISOString();

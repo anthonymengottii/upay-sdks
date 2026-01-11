@@ -5,19 +5,9 @@
 import UpayClient from '../src/index';
 
 async function exemploTransacao() {
-  // Validar API key antes de inicializar cliente
-  const apiKey = process.env.UPAY_API_KEY;
-  if (!apiKey) {
-    console.error('❌ Erro: UPAY_API_KEY não encontrada nas variáveis de ambiente');
-    console.log('\n💡 Para executar este exemplo, defina a variável de ambiente:');
-    console.log('   Windows: $env:UPAY_API_KEY="sua_api_key_aqui"');
-    console.log('   Linux/Mac: export UPAY_API_KEY="sua_api_key_aqui"');
-    process.exit(1);
-  }
-
   // Inicializar cliente
   const upay = new UpayClient({
-    apiKey: apiKey,
+    apiKey: process.env.UPAY_API_KEY || 'sua_api_key_aqui',
   });
 
   try {
@@ -77,22 +67,13 @@ async function exemploTransacao() {
     });
 
     if (validation.valid) {
-      // Validar que os campos necessários estão presentes
-      if (typeof validation.discountCents !== 'number' || !Number.isFinite(validation.discountCents)) {
-        throw new Error('Cupom válido mas discountCents não está disponível na resposta');
-      }
-      
-      if (typeof validation.finalAmountCents !== 'number' || !Number.isFinite(validation.finalAmountCents)) {
-        throw new Error('Cupom válido mas finalAmountCents não está disponível na resposta');
-      }
-
       console.log('Cupom válido!');
-      console.log('Desconto:', `R$ ${(validation.discountCents / 100).toFixed(2)}`);
-      console.log('Valor final:', `R$ ${(validation.finalAmountCents / 100).toFixed(2)}`);
+      console.log('Desconto:', `R$ ${(validation.discountCents! / 100).toFixed(2)}`);
+      console.log('Valor final:', `R$ ${(validation.finalAmountCents! / 100).toFixed(2)}`);
 
       const txWithCoupon = await upay.transactions.create({
         product: 'Produto com Desconto',
-        amountCents: validation.finalAmountCents,
+        amountCents: validation.finalAmountCents!,
         paymentMethod: 'PIX',
         couponCode: 'DESCONTO10',
         client: {
@@ -102,8 +83,6 @@ async function exemploTransacao() {
       });
 
       console.log('✅ Transação com cupom criada:', txWithCoupon.id);
-    } else {
-      console.log('⚠️ Cupom inválido ou não encontrado');
     }
 
   } catch (error: any) {
@@ -114,8 +93,14 @@ async function exemploTransacao() {
   }
 }
 
-// Executar exemplo
-if (require.main === module) {
+// Executar exemplo quando rodado diretamente
+// Suporta tanto CommonJS quanto ES modules
+const isMainModule = 
+  (typeof require !== 'undefined' && require.main === module) || // CommonJS
+  (typeof import.meta !== 'undefined' && import.meta.url && 
+   process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]); // ES module
+
+if (isMainModule) {
   exemploTransacao();
 }
 

@@ -30,6 +30,6 @@ public class CouponsResource {
         body.put("code", code.trim());
         body.put("amountCents", amountCents);
 
-        return http.postPublic("/api/coupons/validate", body);
+        return http.postPublic("/coupons/validate", body);
     }
 }

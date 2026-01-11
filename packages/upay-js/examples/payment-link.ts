@@ -35,24 +35,13 @@ async function exemploPaymentLink() {
     console.log('URL do checkout:', upay.paymentLinks.getCheckoutUrl(paymentLink.slug));
 
     // 2. Criar link com produtos
-    // NOTA: Você precisa ter produtos criados primeiro ou usar IDs de produtos existentes
-    // Opção 1: Listar produtos existentes
-    // const { data: products } = await upay.products.list({ page: 1, limit: 10 });
-    // const productIds = products.map(p => p.id);
-    
-    // Opção 2: Criar produtos primeiro
-    // const product1 = await upay.products.create({ name: 'Produto 1', priceCents: 5000 });
-    // const product2 = await upay.products.create({ name: 'Produto 2', priceCents: 3000 });
-    
     console.log('\n📦 Criando link com produtos...');
-    // IMPORTANTE: Substitua 'produto-id-1' e 'produto-id-2' pelos IDs reais dos seus produtos
-    // Você pode obter os IDs listando produtos (upay.products.list) ou criando novos (upay.products.create)
     const productLink = await upay.paymentLinks.create({
       title: 'Pacote Completo',
       description: 'Pacote com múltiplos produtos',
       products: [
-        { productId: 'produto-id-1', quantity: 2 }, // Substitua por ID real
-        { productId: 'produto-id-2', quantity: 1 }, // Substitua por ID real
+        { productId: 'produto-id-1', quantity: 2 },
+        { productId: 'produto-id-2', quantity: 1 },
       ],
       currency: 'BRL',
       settings: {
@@ -81,13 +70,13 @@ async function exemploPaymentLink() {
     console.log('\n✏️ Atualizando link...');
     const updatedLink = await upay.paymentLinks.update(paymentLink.id, {
       description: 'Descrição atualizada',
-      amount: 12000, // R$ 120,00 em centavos (o campo 'amount' é convertido para 'amountCents' internamente)
+      amount: 12000, // R$ 120,00 (convertido para amountCents internamente)
     });
 
     console.log('✅ Link atualizado!');
     console.log('Nova descrição:', updatedLink.description);
-    // A resposta retorna amountCents como campo canônico
-    console.log('Novo valor:', `R$ ${(updatedLink.amountCents / 100).toFixed(2)}`);
+    // A API retorna amountCents na resposta, mesmo que usemos 'amount' na requisição
+    console.log('Novo valor:', updatedLink.amountCents);
 
     // 5. Obter link por slug
     console.log('\n🔍 Buscando link por slug...');

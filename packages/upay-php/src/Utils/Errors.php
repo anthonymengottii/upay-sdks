@@ -24,8 +24,7 @@ class Errors
                 return new UpayValidationError($message, $details);
             case 404:
                 $resourceId = $body['id'] ?? null;
-                $errorMessage = !empty($message) ? $message : 'Recurso não encontrado';
-                return new UpayNotFoundError($errorMessage, $resourceId);
+                return new UpayNotFoundError('Recurso', $resourceId);
             case 429:
                 return new UpayRateLimitError($message);
             case 500:

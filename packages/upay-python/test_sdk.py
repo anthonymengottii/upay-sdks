@@ -11,10 +11,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from upay import UpayClient
 
 # API Key fornecida pelo usuário
-API_KEY = "sua_api_key"
+API_KEY = "upay_23e64c303a614152f6fc0ef2a52e7a79d081d19fed1b4f50cf87444c994485fd"
 
 # Base URL - usar localhost para desenvolvimento
-BASE_URL = os.getenv("UPAY_BASE_URL", "https://upay-sistema-api.onrender.com")
+BASE_URL = os.getenv("UPAY_BASE_URL", "http://localhost:3001")
 
 def test_sdk():
     """Testa o SDK Upay Python"""
@@ -89,29 +89,21 @@ def test_sdk():
         
         # Teste 5: Validar Cupom
         print("\nTeste 5: Validar Cupom...")
-        # Ler código do cupom de variável de ambiente ou usar valor padrão para teste
-        test_coupon_code = os.getenv("UPAY_TEST_COUPON")
-        
-        if not test_coupon_code:
-            print("[AVISO] Teste de cupom pulado: UPAY_TEST_COUPON environment variable não definida.")
-            print("   Para executar este teste, defina UPAY_TEST_COUPON com o código de um cupom válido.")
-            print("   Exemplo: export UPAY_TEST_COUPON='CUPOM10'")
-        else:
-            try:
-                validation = upay.coupons.validate(
-                    code=test_coupon_code,
-                    amount_cents=10000
-                )
-                if validation['valid']:
-                    print(f"[OK] Cupom valido!")
-                    print(f"   Desconto: R$ {validation['discountCents'] / 100:.2f}")
-                    print(f"   Valor final: R$ {validation['finalAmountCents'] / 100:.2f}")
-                else:
-                    print(f"[AVISO] Cupom invalido: {validation.get('message', 'Cupom nao encontrado')}")
-            except Exception as e:
-                print(f"[ERRO] Erro: {e}")
-                import traceback
-                traceback.print_exc()
+        try:
+            validation = upay.coupons.validate(
+                code="CUPOMTESTE",
+                amount_cents=10000
+            )
+            if validation['valid']:
+                print(f"[OK] Cupom valido!")
+                print(f"   Desconto: R$ {validation['discountCents'] / 100:.2f}")
+                print(f"   Valor final: R$ {validation['finalAmountCents'] / 100:.2f}")
+            else:
+                print(f"[AVISO] Cupom invalido: {validation.get('message', 'Cupom nao encontrado')}")
+        except Exception as e:
+            print(f"[ERRO] Erro: {e}")
+            import traceback
+            traceback.print_exc()
         
         # Teste 6: Criar e Deletar Payment Link
         print("\nTeste 6: Criar e Deletar Payment Link...")

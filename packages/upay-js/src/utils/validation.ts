@@ -33,13 +33,93 @@ export function validateEmail(email: string): boolean {
 }
 
 /**
- * Valida formato de CPF/CNPJ (apenas formato básico)
+ * Valida CPF com dígitos verificadores
+ */
+function validateCPF(cpf: string): boolean {
+  // Rejeita padrões repetidos (111.111.111-11, etc)
+  if (/^(\d)\1{10}$/.test(cpf)) {
+    return false;
+  }
+
+  const digits = cpf.split('').map(Number);
+  
+  // Valida primeiro dígito verificador
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += digits[i] * (10 - i);
+  }
+  let remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== digits[9]) {
+    return false;
+  }
+
+  // Valida segundo dígito verificador
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += digits[i] * (11 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== digits[10]) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Valida CNPJ com dígitos verificadores
+ */
+function validateCNPJ(cnpj: string): boolean {
+  // Rejeita padrões repetidos (11.111.111/1111-11, etc)
+  if (/^(\d)\1{13}$/.test(cnpj)) {
+    return false;
+  }
+
+  const digits = cnpj.split('').map(Number);
+  const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
+  // Valida primeiro dígito verificador
+  let sum = 0;
+  for (let i = 0; i < 12; i++) {
+    sum += digits[i] * weights1[i];
+  }
+  let remainder = sum % 11;
+  const digit1 = remainder < 2 ? 0 : 11 - remainder;
+  if (digit1 !== digits[12]) {
+    return false;
+  }
+
+  // Valida segundo dígito verificador
+  sum = 0;
+  for (let i = 0; i < 13; i++) {
+    sum += digits[i] * weights2[i];
+  }
+  remainder = sum % 11;
+  const digit2 = remainder < 2 ? 0 : 11 - remainder;
+  if (digit2 !== digits[13]) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Valida formato de CPF/CNPJ com verificação de dígitos verificadores
  */
 export function validateDocument(document: string): boolean {
   // Remove caracteres não numéricos
   const cleanDoc = document.replace(/\D/g, '');
-  // CPF tem 11 dígitos, CNPJ tem 14
-  return cleanDoc.length === 11 || cleanDoc.length === 14;
+  
+  if (cleanDoc.length === 11) {
+    return validateCPF(cleanDoc);
+  } else if (cleanDoc.length === 14) {
+    return validateCNPJ(cleanDoc);
+  }
+  
+  return false;
 }
 
 /**
@@ -63,15 +143,43 @@ export function validateURL(url: string): boolean {
 }
 
 /**
- * Valida data de expiração (deve ser futura)
+ * Valida data de expiração (deve ser válida até o final do mês de expiração)
  */
 export function validateExpirationDate(date: Date | string): boolean {
-  const expirationDate = typeof date === 'string' ? new Date(date) : date;
+  let expirationYear: number;
+  let expirationMonth: number;
 
-  // Verifica se a data é válida
-  if (Number.isNaN(expirationDate.getTime())) {
+  // Parse do input
+  if (typeof date === 'string') {
+    // Suporta formatos "YYYY-MM" ou "YYYY-MM-DD"
+    const parts = date.split('-');
+    if (parts.length < 2) {
+      return false;
+    }
+    expirationYear = parseInt(parts[0], 10);
+    expirationMonth = parseInt(parts[1], 10);
+  } else if (date instanceof Date) {
+    expirationYear = date.getFullYear();
+    expirationMonth = date.getMonth() + 1; // getMonth() retorna 0-11
+  } else {
     return false;
   }
 
-  return expirationDate > new Date();
+  // Validação básica
+  if (!Number.isFinite(expirationYear) || !Number.isFinite(expirationMonth)) {
+    return false;
+  }
+
+  if (expirationMonth < 1 || expirationMonth > 12) {
+    return false;
+  }
+
+  // Obtém ano/mês atual (timezone-agnostic usando UTC)
+  const now = new Date();
+  const nowYear = now.getUTCFullYear();
+  const nowMonth = now.getUTCMonth() + 1; // getUTCMonth() retorna 0-11
+
+  // Compara apenas ano/mês: válido se ano > atual ou (ano === atual e mês >= atual)
+  return expirationYear > nowYear || 
+         (expirationYear === nowYear && expirationMonth >= nowMonth);
 }

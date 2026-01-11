@@ -40,24 +40,6 @@ export class UpayValidationError extends UpayError {
   }
 }
 
-/**
- * Validation error with field context for client-side validation
- */
-export class ValidationError extends Error {
-  public field: string;
-
-  constructor(message: string, field: string) {
-    super(message);
-    this.name = 'ValidationError';
-    this.field = field;
-    
-    // Mantém o stack trace correto
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, ValidationError);
-    }
-  }
-}
-
 export class UpayNotFoundError extends UpayError {
   constructor(resource: string, id?: string) {
     super(
@@ -80,13 +62,6 @@ export class UpayServerError extends UpayError {
   constructor(message: string = 'Erro interno do servidor. Tente novamente mais tarde.') {
     super(message, 'SERVER_ERROR', 500);
     this.name = 'UpayServerError';
-  }
-}
-
-export class ConfigurationError extends UpayError {
-  constructor(message: string) {
-    super(message, 'CONFIGURATION_ERROR', 400);
-    this.name = 'ConfigurationError';
   }
 }
 

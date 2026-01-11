@@ -11,6 +11,12 @@ public class UpayException extends RuntimeException {
         this.status = status;
     }
 
+    public UpayException(String message, String code, int status, Throwable cause) {
+        super(message, cause);
+        this.code = code;
+        this.status = status;
+    }
+
     public String getCode() {
         return code;
     }

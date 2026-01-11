@@ -26,34 +26,13 @@ class UpayClient
         string $version = 'v1',
         int $timeout = 30
     ) {
-        // Validar API key
         if (empty($apiKey)) {
             throw new \InvalidArgumentException('API Key é obrigatória');
         }
         
-        // Validar version
-        if (empty($version) || trim($version) === '') {
-            throw new \InvalidArgumentException('Version deve ser uma string não vazia');
-        }
-        
-        // Validar timeout
-        if ($timeout <= 0) {
-            throw new \InvalidArgumentException('Timeout deve ser um inteiro positivo');
-        }
-        
-        // Validar baseUrl se fornecido
-        $finalBaseUrl = $baseUrl ?? 'https://upay-sistema-api.onrender.com/';
-        if ($baseUrl !== null) {
-            $validatedUrl = filter_var($baseUrl, FILTER_VALIDATE_URL);
-            if ($validatedUrl === false) {
-                throw new \InvalidArgumentException('baseUrl deve ser uma URL válida');
-            }
-            $finalBaseUrl = $validatedUrl;
-        }
-        
         $this->http = new HttpClient(
             $apiKey,
-            $finalBaseUrl,
+            $baseUrl ?? 'https://api.upay-sistema.onrender.com',
             $version,
             $timeout
         );

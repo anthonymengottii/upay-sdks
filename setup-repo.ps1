@@ -36,12 +36,24 @@ $filesToRemove = @(
 
 foreach ($item in $filesToRemove) {
     if (Test-Path $item) {
-        if ((Get-Item $item).PSIsContainer) {
-            Remove-Item -Recurse -Force $item -ErrorAction SilentlyContinue
-        } else {
-            Remove-Item -Force $item -ErrorAction SilentlyContinue
+        try {
+            $error.Clear()
+            if ((Get-Item $item).PSIsContainer) {
+                Remove-Item -Recurse -Force $item -ErrorVariable removeError
+            } else {
+                Remove-Item -Force $item -ErrorVariable removeError
+            }
+            
+            if ($removeError) {
+                Write-Host "   ⚠️  Erro ao remover: $item" -ForegroundColor Yellow
+                Write-Host "      Mensagem: $($removeError[0].Exception.Message)" -ForegroundColor Yellow
+            } else {
+                Write-Host "   Removido: $item" -ForegroundColor Gray
+            }
+        } catch {
+            Write-Host "   ❌ Falha ao remover: $item" -ForegroundColor Red
+            Write-Host "      Erro: $($_.Exception.Message)" -ForegroundColor Red
         }
-        Write-Host "   Removido: $item" -ForegroundColor Gray
     }
 }
 

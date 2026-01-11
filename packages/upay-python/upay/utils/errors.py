@@ -58,14 +58,6 @@ class UpayServerError(UpayError):
         super().__init__(message, "SERVER_ERROR", 500)
 
 
-class UpayRequestError(UpayError):
-    """Erro na requisição HTTP"""
-    
-    def __init__(self, message: str, original_error: Optional[Exception] = None):
-        super().__init__(message, "REQUEST_ERROR", None)
-        self.original_error = original_error
-
-
 def handle_api_error(response, body: Optional[Any] = None) -> UpayError:
     """
     Converte erros HTTP em erros do SDK

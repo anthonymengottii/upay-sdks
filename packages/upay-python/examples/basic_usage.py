@@ -2,25 +2,12 @@
 Exemplo básico de uso do SDK Upay Python
 """
 
-import os
 from upay import UpayClient
-
-# Carregar variáveis de ambiente (opcional: usar python-dotenv para carregar de .env)
-# from dotenv import load_dotenv
-# load_dotenv()
-
-# Ler API key de variável de ambiente (obrigatória)
-api_key = os.environ.get("UPAY_API_KEY")
-if not api_key:
-    raise ValueError("UPAY_API_KEY environment variable is required. Please set it before running this example.")
-
-# Ler base_url de variável de ambiente (opcional, com valor padrão)
-base_url = os.environ.get("UPAY_BASE_URL", "https://upay-sistema-api.onrender.com")
 
 # Inicializar o cliente
 upay = UpayClient(
-    api_key=api_key,
-    base_url=base_url
+    api_key="sua_api_key_aqui",
+    base_url="http://localhost:3001"  # Para desenvolvimento local
 )
 
 def exemplo_payment_links():

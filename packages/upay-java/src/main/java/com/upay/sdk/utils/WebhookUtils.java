@@ -9,7 +9,11 @@ public final class WebhookUtils {
     private WebhookUtils() {}
 
     public static boolean verifySignature(String payload, String signature, String secret) {
-        if (payload == null || signature == null || secret == null) return false;
+        if (payload == null || payload.trim().isEmpty() || 
+            signature == null || signature.trim().isEmpty() || 
+            secret == null || secret.trim().isEmpty()) {
+            return false;
+        }
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));

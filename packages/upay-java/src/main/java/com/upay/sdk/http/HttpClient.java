@@ -6,11 +6,14 @@ import com.upay.sdk.utils.UpayException;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HttpClientWrapper {
 
@@ -22,33 +25,20 @@ public class HttpClientWrapper {
     private final ObjectMapper mapper = new ObjectMapper();
 
     public HttpClientWrapper(String apiKey, String baseUrl, String version, int timeoutSeconds) {
-        // Validate apiKey
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            throw new IllegalArgumentException("API key is required");
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalArgumentException("apiKey must not be null or empty");
         }
+        if (baseUrl == null || baseUrl.isBlank()) {
+            throw new IllegalArgumentException("baseUrl must not be null or empty");
+        }
+        
         this.apiKey = apiKey;
-        
-        // Validate baseUrl
-        if (baseUrl == null || baseUrl.trim().isEmpty()) {
-            throw new IllegalArgumentException("Base URL is required");
-        }
-        String trimmedBaseUrl = baseUrl.trim();
-        this.baseUrl = trimmedBaseUrl.endsWith("/") ? trimmedBaseUrl.substring(0, trimmedBaseUrl.length() - 1) : trimmedBaseUrl;
-        
-        // Validate and set version
-        if (version == null || version.trim().isEmpty()) {
-            this.version = "v1";
-        } else {
-            this.version = version.trim();
-        }
-        
-        // Validate and set timeoutSeconds
-        if (timeoutSeconds <= 0) {
-            this.timeoutSeconds = 30;
-        } else {
-            this.timeoutSeconds = timeoutSeconds;
-        }
-        
+        String normalizedBaseUrl = baseUrl.trim();
+        this.baseUrl = normalizedBaseUrl.endsWith("/") 
+                ? normalizedBaseUrl.substring(0, normalizedBaseUrl.length() - 1) 
+                : normalizedBaseUrl;
+        this.version = version != null ? version : "v1";
+        this.timeoutSeconds = timeoutSeconds > 0 ? timeoutSeconds : 30;
         this.client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(this.timeoutSeconds))
                 .build();
@@ -75,26 +65,35 @@ public class HttpClientWrapper {
     }
 
     public JsonNode postPublic(String endpoint, Map<String, Object> body) throws IOException, InterruptedException {
-        return requestPublic("POST", endpoint, body, null);
+        return requestPublic("POST", endpoint, body);
     }
 
-    private JsonNode requestPublic(String method, String endpoint, Map<String, Object> body, Map<String, Object> params)
+    private JsonNode requestPublic(String method, String endpoint, Map<String, Object> body)
             throws IOException, InterruptedException {
 
-        StringBuilder url = new StringBuilder(baseUrl)
-                .append(endpoint.startsWith("/") ? endpoint : "/" + endpoint);
+        // Normalize endpoint: ensure it starts with a single leading slash
+        String normalizedEndpoint = endpoint;
+        if (normalizedEndpoint == null || normalizedEndpoint.isEmpty()) {
+            normalizedEndpoint = "/";
+        } else if (!normalizedEndpoint.startsWith("/")) {
+            normalizedEndpoint = "/" + normalizedEndpoint;
+        }
 
-        if (params != null && !params.isEmpty()) {
-            String query = params.entrySet().stream()
-                    .filter(e -> e.getValue() != null)
-                    .map(e -> e.getKey() + "=" + e.getValue())
-                    .reduce((a, b) -> a + "&" + b)
-                    .orElse("");
-            if (!query.isEmpty()) url.append("?").append(query);
+        StringBuilder url = new StringBuilder(baseUrl)
+                .append("/api/")
+                .append(version)
+                .append(normalizedEndpoint);
+
+        URI uri;
+        try {
+            uri = URI.create(url.toString());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Invalid URL constructed: " + url.toString() + ". Original error: " + e.getMessage(), e);
         }
 
         HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(url.toString()))
+                .uri(uri)
                 .timeout(Duration.ofSeconds(timeoutSeconds))
                 .header("Content-Type", "application/json")
                 .header("User-Agent", "Upay-Java-SDK/1.0.0");
@@ -130,22 +129,41 @@ public class HttpClientWrapper {
     private JsonNode request(String method, String endpoint, Map<String, Object> body, Map<String, Object> params)
             throws IOException, InterruptedException {
 
+        // Normalize endpoint: ensure it starts with a single leading slash
+        String normalizedEndpoint = endpoint;
+        if (normalizedEndpoint == null || normalizedEndpoint.isEmpty()) {
+            normalizedEndpoint = "/";
+        } else if (!normalizedEndpoint.startsWith("/")) {
+            normalizedEndpoint = "/" + normalizedEndpoint;
+        }
+
         StringBuilder url = new StringBuilder(baseUrl)
                 .append("/api/")
                 .append(version)
-                .append(endpoint);
+                .append(normalizedEndpoint);
 
         if (params != null && !params.isEmpty()) {
             String query = params.entrySet().stream()
                     .filter(e -> e.getValue() != null)
-                    .map(e -> e.getKey() + "=" + e.getValue())
-                    .reduce((a, b) -> a + "&" + b)
-                    .orElse("");
+                    .map(e -> {
+                        String encodedKey = URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8);
+                        String encodedValue = URLEncoder.encode(e.getValue().toString(), StandardCharsets.UTF_8);
+                        return encodedKey + "=" + encodedValue;
+                    })
+                    .collect(Collectors.joining("&"));
             if (!query.isEmpty()) url.append("?").append(query);
         }
 
+        URI uri;
+        try {
+            uri = URI.create(url.toString());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Invalid URL constructed: " + url.toString() + ". Original error: " + e.getMessage(), e);
+        }
+
         HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(url.toString()))
+                .uri(uri)
                 .timeout(Duration.ofSeconds(timeoutSeconds))
                 .header("Authorization", "Bearer " + apiKey)
                 .header("Content-Type", "application/json")

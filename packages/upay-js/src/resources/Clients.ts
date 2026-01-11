@@ -3,7 +3,6 @@
  */
 
 import { HttpClient } from '../utils/http';
-import { ValidationError } from '../utils/errors';
 import type {
   CreateClientRequest,
   Client,
@@ -18,9 +17,14 @@ export class ClientsResource {
    * Cria um novo cliente
    */
   async create(data: CreateClientRequest): Promise<Client> {
-    // Validar campos obrigatórios
-    this.validateName(data.name, true);
-    this.validateEmail(data.email, true);
+    // Validação básica
+    if (!data.name || data.name.trim().length === 0) {
+      throw new Error('Nome do cliente é obrigatório');
+    }
+
+    if (!data.email || !this.isValidEmail(data.email)) {
+      throw new Error('Email inválido');
+    }
 
     return this.http.post<Client>('/clients', data);
   }
@@ -43,57 +47,30 @@ export class ClientsResource {
    */
   async get(id: string): Promise<Client> {
     if (!id || id.trim().length === 0) {
-      throw new ValidationError('ID is required', 'id');
+      throw new Error('ID é obrigatório');
     }
-    
-    // URL-encode o ID para garantir segurança
-    const encodedId = encodeURIComponent(id);
-    return this.http.get<Client>(`/clients/${encodedId}`);
+    return this.http.get<Client>(`/clients/${id}`);
   }
 
   /**
    * Atualiza um cliente
    */
   async update(id: string, data: Partial<CreateClientRequest>): Promise<Client> {
-    // Validar ID
     if (!id || id.trim().length === 0) {
-      throw new ValidationError('ID is required', 'id');
+      throw new Error('ID é obrigatório');
     }
 
-    // Validar campos apenas se presentes no Partial
-    if (data.name !== undefined) {
-      this.validateName(data.name, true);
+    if (data.name !== undefined && (!data.name || data.name.trim().length === 0)) {
+      throw new Error('Nome do cliente é obrigatório');
     }
 
     if (data.email !== undefined) {
-      this.validateEmail(data.email, true);
+      if (!data.email || data.email.trim().length === 0 || !this.isValidEmail(data.email)) {
+        throw new Error('Email inválido');
+      }
     }
 
-    // URL-encode o ID para garantir segurança
-    const encodedId = encodeURIComponent(id);
-    return this.http.patch<Client>(`/clients/${encodedId}`, data);
-  }
-
-  /**
-   * Valida nome do cliente
-   */
-  private validateName(name: string | undefined, required: boolean = false): void {
-    if (required && (!name || name.trim().length === 0)) {
-      throw new ValidationError('Client name is required', 'name');
-    }
-  }
-
-  /**
-   * Valida email do cliente
-   */
-  private validateEmail(email: string | undefined, required: boolean = false): void {
-    if (required && !email) {
-      throw new ValidationError('Email is required', 'email');
-    }
-
-    if (email && !this.isValidEmail(email)) {
-      throw new ValidationError('Invalid email format', 'email');
-    }
+    return this.http.patch<Client>(`/clients/${id}`, data);
   }
 
   /**

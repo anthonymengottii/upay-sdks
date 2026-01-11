@@ -65,10 +65,7 @@ class ProductsResource:
             "orderDirection": order_direction,
         }
         
-        # Filtrar valores None antes de passar para http.get
-        filtered_params = {k: v for k, v in params.items() if v is not None}
-        
-        response = self.http.get("/products", filtered_params)
+        response = self.http.get("/products", params)
         
         # Mapear resposta: { message, products, pagination } -> { data, pagination }
         return {

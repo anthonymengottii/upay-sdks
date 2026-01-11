@@ -25,7 +25,7 @@ public class PaymentLinksResource {
             throw new IllegalArgumentException("Title must be at least 3 characters");
         }
         if ((amountCents == null || amountCents < 100) && (options == null || !options.containsKey("products"))) {
-            throw new IllegalArgumentException("Either amountCents or products must be provided");
+            throw new IllegalArgumentException("Either products must be provided or amountCents must be at least 100");
         }
 
         Map<String, Object> body = new HashMap<>();
@@ -33,11 +33,10 @@ public class PaymentLinksResource {
         if (amountCents != null) {
             body.put("amountCents", amountCents);
         }
-        // Merge options, but skip keys that would overwrite validated fields
         if (options != null) {
+            // Defensive copy: only add options that don't override validated fields
             for (Map.Entry<String, Object> entry : options.entrySet()) {
                 String key = entry.getKey();
-                // Skip title and amountCents to prevent overwriting validated fields
                 if (!"title".equals(key) && !"amountCents".equals(key)) {
                     body.put(key, entry.getValue());
                 }

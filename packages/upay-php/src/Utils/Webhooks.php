@@ -34,14 +34,11 @@ class Webhooks
      */
     public static function extractSignature(array $headers): ?string
     {
-        // Normalizar headers para lowercase (HTTP headers são case-insensitive)
-        $normalizedHeaders = array_change_key_case($headers, CASE_LOWER);
-        
         $signatureHeader = 
-            $normalizedHeaders['x-upay-signature'] ??
-            $normalizedHeaders['x-upay-signature-256'] ??
-            $normalizedHeaders['upay-signature'] ??
-            $normalizedHeaders['signature'] ??
+            $headers['x-upay-signature'] ??
+            $headers['x-upay-signature-256'] ??
+            $headers['upay-signature'] ??
+            $headers['signature'] ??
             null;
         
         if (!$signatureHeader) {

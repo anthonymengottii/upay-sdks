@@ -13,7 +13,7 @@ public class Main {
         }
         String baseUrl = System.getenv("UPAY_BASE_URL");
         if (baseUrl == null || baseUrl.isBlank()) {
-            baseUrl = "https://upay-sistema-api.onrender.com";
+            baseUrl = "http://localhost:3001";
         }
 
         System.out.println("Testando SDK Upay Java...\n");
@@ -22,41 +22,15 @@ public class Main {
         UpayClient upay = new UpayClient(apiKey, baseUrl, "v1", 30);
 
         // Teste 1: Listar Payment Links
+        System.out.println("Teste 1: Listar Payment Links...");
         JsonNode links = upay.paymentLinks.list(1, 5);
-        testListEndpoint("Teste 1: Listar Payment Links...", links, "Payment Links");
+        System.out.println(links.toPrettyString());
 
         // Teste 2: Listar Produtos
+        System.out.println("\nTeste 2: Listar Produtos...");
         JsonNode products = upay.products.list(1, 5);
-        testListEndpoint("\nTeste 2: Listar Produtos...", products, "Produtos");
+        System.out.println(products.toPrettyString());
 
         System.out.println("\n[OK] Testes do SDK Java concluídos.");
-    }
-
-    /**
-     * Helper method to test list endpoints and print results
-     * @param title Title to print before the test
-     * @param response JsonNode response from the API
-     * @param itemTypeLabel Label for the item type (e.g., "Payment Links", "Produtos")
-     */
-    private static void testListEndpoint(String title, JsonNode response, String itemTypeLabel) {
-        System.out.println(title);
-        
-        if (response.has("data") && response.get("data").isArray()) {
-            JsonNode dataArray = response.get("data");
-            int count = dataArray.size();
-            System.out.println(itemTypeLabel + " encontrados: " + count);
-            
-            if (count > 0) {
-                System.out.println("Primeiros IDs: ");
-                for (int i = 0; i < Math.min(count, 3); i++) {
-                    JsonNode item = dataArray.get(i);
-                    if (item.has("id")) {
-                        System.out.println("  - " + item.get("id").asText());
-                    }
-                }
-            }
-        } else {
-            System.out.println("Resposta recebida (estrutura não esperada)");
-        }
     }
 }

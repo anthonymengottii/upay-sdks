@@ -25,7 +25,7 @@ mvn compile
 import com.upay.sdk.UpayClient;
 
 String apiKey = "SUA_API_KEY_AQUI";
-String baseUrl = "https://upay-sistema-api.onrender.com";
+String baseUrl = "https://api.upay-sistema.onrender.com"; // ou http://localhost:3001 em dev
 
 UpayClient upay = new UpayClient(apiKey, baseUrl, "v1", 30);
 `
@@ -67,11 +67,11 @@ System.out.println(products.toPrettyString());
 
 ## 💳 Transações
 
-Transaction creation/processing is not supported in this SDK version; only read/list operations are available. For future implementation of transaction creation and processing, please refer to the [public API documentation](https://docs.upaybr.com) or check the SDK roadmap.
+(Exposição de criação/processamento via API pública pode ser ajustada depois; por enquanto, foque em leitura/listagem)
 
 `java
-TransactionListResponse transactions = upay.transactions.list(1, 10);
-System.out.println(transactions.getData().size() + " transactions found");
+JsonNode transactions = upay.transactions.list(1, 10);
+System.out.println(transactions.toPrettyString());
 `
 
 ## 🎫 Cupons
@@ -104,7 +104,7 @@ if (!valid) {
 Já existe um exemplo em src/main/java/com/upay/sdk/examples/Main.java que:
 
 - Usa sua API Key de teste
-- Aponta para https://upay-sistema-api.onrender.com
+- Aponta para http://localhost:3001
 - Lista Payment Links e Produtos
 
 Para executar:

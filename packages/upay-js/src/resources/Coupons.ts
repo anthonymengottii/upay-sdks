@@ -28,8 +28,10 @@ export class CouponsResource {
 
     // Endpoint público em /api/coupons/validate (sem /v1)
     // Faz requisição sem autenticação
-    const baseUrl = this.http.baseUrl || 'https://upay-sistema-api.onrender.com';
-    const url = `${baseUrl}/api/coupons/validate`;
+    if (!this.http.baseUrl) {
+      throw new Error('baseUrl must be configured. Set baseUrl when creating UpayClient instance.');
+    }
+    const url = `${this.http.baseUrl}/api/coupons/validate`;
 
     // Usar fetch global ou polyfill
     const fetchFn = typeof fetch !== 'undefined' ? fetch : require('undici').fetch;

@@ -87,29 +87,24 @@ app.post('/webhook', (req, res) => {
   }
 });
 
-// Iniciar servidor apenas quando executado diretamente
-// Verifica se o arquivo está sendo executado diretamente (não importado)
-// Usa uma verificação que funciona tanto em CommonJS quanto ESM
-const isMainModule = (() => {
-  // CommonJS
-  if (typeof require !== 'undefined' && require.main === module) {
-    return true;
-  }
-  // ESM: verifica se o arquivo sendo executado corresponde a este módulo
-  if (typeof import.meta !== 'undefined' && import.meta.url && typeof process !== 'undefined' && process.argv[1]) {
-    const currentFile = import.meta.url.replace(/^file:\/\//, '').replace(/\\/g, '/');
-    const executedFile = process.argv[1].replace(/\\/g, '/');
-    return currentFile === executedFile || executedFile.includes('webhook');
-  }
-  return false;
-})();
-
-if (isMainModule) {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
+// Função para iniciar o servidor (não inicia automaticamente no import)
+export function startServer(port?: number) {
+  const PORT = port || process.env.PORT || 3000;
+  return app.listen(PORT, () => {
     console.log(`🚀 Servidor de webhooks rodando na porta ${PORT}`);
     console.log(`📡 Endpoint: http://localhost:${PORT}/webhook`);
   });
+}
+
+// Iniciar servidor apenas quando executado diretamente
+// Suporta tanto CommonJS quanto ES modules
+const isMainModule = 
+  (typeof require !== 'undefined' && require.main === module) || // CommonJS
+  (typeof import.meta !== 'undefined' && import.meta.url && 
+   process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]); // ES module
+
+if (isMainModule) {
+  startServer();
 }
 
 export default app;

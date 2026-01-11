@@ -15,19 +15,12 @@ export class PaymentLinksResource {
   constructor(private http: HttpClient) {}
 
   /**
-   * Mapeia a resposta da API para um PaymentLink
-   * @private
-   */
-  private mapPaymentLinkResponse(response: any): PaymentLink {
-    return response.paymentLink || response.data || response;
-  }
-
-  /**
    * Cria um novo link de pagamento
    */
   async create(data: CreatePaymentLinkRequest): Promise<PaymentLink> {
     // Validação básica
-    if (!data.title || data.title.trim().length < 3) {
+    const title = (data.title || '').trim();
+    if (title.length < 3) {
       throw new Error('Título deve ter pelo menos 3 caracteres');
     }
 
@@ -40,7 +33,7 @@ export class PaymentLinksResource {
     }
 
     const response = await this.http.post<any>('/payment-links', {
-      title: data.title,
+      title: title,
       description: data.description,
       amountCents: data.amount,
       products: data.products,
@@ -54,7 +47,8 @@ export class PaymentLinksResource {
       stockEnabled: data.stockEnabled,
     });
     
-    return this.mapPaymentLinkResponse(response);
+    // Mapear resposta da API: { message, data } -> retornar data diretamente
+    return response.data || response;
   }
 
   /**
@@ -85,7 +79,8 @@ export class PaymentLinksResource {
       throw new Error('ID é obrigatório');
     }
     const response = await this.http.get<any>(`/payment-links/${id}`);
-    return this.mapPaymentLinkResponse(response);
+    // Mapear resposta da API: { message, paymentLink } -> retornar paymentLink
+    return response.paymentLink || response.data || response;
   }
 
   /**
@@ -96,7 +91,8 @@ export class PaymentLinksResource {
       throw new Error('Slug é obrigatório');
     }
     const response = await this.http.get<any>(`/payment-links/slug/${slug}`);
-    return this.mapPaymentLinkResponse(response);
+    // Mapear resposta da API: { message, paymentLink } -> retornar paymentLink
+    return response.paymentLink || response.data || response;
   }
 
   /**
@@ -116,8 +112,7 @@ export class PaymentLinksResource {
     if (data.redirectUrl !== undefined) updateData.redirectUrl = data.redirectUrl;
     if (data.settings !== undefined) updateData.settings = data.settings;
 
-    const response = await this.http.patch<any>(`/payment-links/${id}`, updateData);
-    return this.mapPaymentLinkResponse(response);
+    return this.http.patch<PaymentLink>(`/payment-links/${id}`, updateData);
   }
 
   /**
@@ -134,18 +129,7 @@ export class PaymentLinksResource {
    * Obtém a URL pública do checkout
    */
   getCheckoutUrl(slug: string, baseUrl?: string): string {
-    // Validar slug
-    if (!slug || typeof slug !== 'string' || slug.trim().length === 0) {
-      throw new Error('Slug é obrigatório e deve ser uma string não vazia');
-    }
-
-    // Normalizar baseUrl (remover trailing slash se existir)
-    const normalizedBaseUrl = (baseUrl || 'https://checkout.upaybr.com').trim().replace(/\/+$/, '');
-    
-    // Normalizar slug (remover leading slashes, trim, e URL-encode)
-    const normalizedSlug = slug.trim().replace(/^\/+/, '');
-    const encodedSlug = encodeURIComponent(normalizedSlug);
-    
-    return `${normalizedBaseUrl}/${encodedSlug}`;
+    const checkoutBase = baseUrl || 'https://checkout.upaybr.com';
+    return `${checkoutBase}/${slug}`;
   }
 }

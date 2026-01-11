@@ -23,7 +23,6 @@ import { ProductsResource } from './resources/Products';
 import { CouponsResource } from './resources/Coupons';
 import { ClientsResource } from './resources/Clients';
 import { verifyWebhookSignature, extractWebhookSignature } from './utils/webhooks';
-import { ConfigurationError } from './utils/errors';
 import type { UpayConfig } from './types';
 
 export class UpayClient {
@@ -36,14 +35,8 @@ export class UpayClient {
   public readonly clients: ClientsResource;
 
   constructor(config: UpayConfig) {
-    // Validar que config não é null/undefined
-    if (!config) {
-      throw new ConfigurationError('Configuração é obrigatória');
-    }
-    
-    // Validar que apiKey está presente
     if (!config.apiKey) {
-      throw new ConfigurationError('API Key é obrigatória');
+      throw new Error('API Key é obrigatória');
     }
 
     this.http = new HttpClient(config);

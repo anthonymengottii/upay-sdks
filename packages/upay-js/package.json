@@ -6,15 +6,7 @@
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist/index.js",
-    "dist/index.esm.js",
-    "dist/index.d.ts",
-    "dist/index.d.ts.map",
-    "dist/resources",
-    "dist/types.js",
-    "dist/types.d.ts",
-    "dist/types.d.ts.map",
-    "dist/utils",
+    "dist",
     "README.md"
   ],
   "scripts": {

@@ -68,16 +68,9 @@ class ClientsResource:
         response = self.http.get("/clients", params)
         
         # Mapear resposta: { message, clients, pagination } -> { data, pagination }
-        # Usar checks explícitos de None para preservar valores falsy válidos (listas/dicts vazios)
-        clients_data = response.get("clients") if response.get("clients") is not None else response.get("data")
-        clients_data = clients_data if clients_data is not None else []
-        
-        pagination_data = response.get("pagination")
-        pagination_data = pagination_data if pagination_data is not None else {"total": 0, "page": 1, "limit": 10}
-        
         return {
-            "data": clients_data,
-            "pagination": pagination_data
+            "data": response.get("clients") or response.get("data") or [],
+            "pagination": response.get("pagination") or {"total": 0, "page": 1, "limit": 10}
         }
     
     def get(self, client_id: str) -> Dict[str, Any]:
@@ -109,7 +102,7 @@ class ClientsResource:
         if not client_id:
             raise ValueError("ID é obrigatório")
         
-        if "email" in data and not self._is_valid_email(data["email"]):
+        if data.get("email") and not self._is_valid_email(data["email"]):
             raise ValueError("Email inválido")
         
         return self.http.patch(f"/clients/{client_id}", data)

@@ -22,7 +22,7 @@ import UpayClient from '@upay/upay-js';
 const upay = new UpayClient({
   apiKey: 'sua_api_key_aqui',
   // Opcional: customizar URL base
-  // baseUrl: 'https://upay-sistema-api.onrender.com/',
+  // baseUrl: 'https://api.upay-sistema.onrender.com',
   // version: 'v1',
 });
 ```
@@ -213,7 +213,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
 ```typescript
 const upay = new UpayClient({
   apiKey: 'sua_api_key',        // Obrigatório
-  baseUrl: 'https://upay-sistema-api.onrender.com/',  // Opcional (padrão: https://upay-sistema-api.onrender.com/)
+  baseUrl: 'https://...',        // Opcional (padrão: https://api.upay-sistema.onrender.com)
   version: 'v1',                 // Opcional (padrão: 'v1')
   timeout: 30000,               // Opcional (padrão: 30000ms)
 });
@@ -256,7 +256,7 @@ Veja a pasta `examples/` para exemplos mais detalhados:
 
 ## 🔗 Links Úteis
 
-- [Documentação da API](https://app.upaybr.com/docs)
+- [Documentação da API](https://docs.upaybr.com)
 - [Dashboard](https://app.upaybr.com)
 - [Suporte](mailto:suporte@upaybr.com)
 

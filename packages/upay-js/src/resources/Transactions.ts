@@ -8,7 +8,6 @@ import type {
   Transaction,
   PaginationParams,
   PaginatedResponse,
-  CardData,
 } from '../types';
 
 export class TransactionsResource {
@@ -74,7 +73,7 @@ export class TransactionsResource {
    * Processa o pagamento de uma transação
    */
   async process(id: string, paymentData?: {
-    cardData?: CardData;
+    cardData?: any;
     installments?: number;
   }): Promise<Transaction> {
     if (!id) {
@@ -110,6 +109,17 @@ export class TransactionsResource {
     if (!id) {
       throw new Error('ID é obrigatório');
     }
+    
+    // Validar amountCents se fornecido
+    if (amountCents !== undefined) {
+      if (typeof amountCents !== 'number' || 
+          !Number.isInteger(amountCents) || 
+          amountCents <= 0 || 
+          !Number.isFinite(amountCents)) {
+        throw new Error('amountCents must be a positive integer');
+      }
+    }
+    
     return this.http.post<Transaction>(`/transactions/${id}/refund`, {
       amountCents,
     });

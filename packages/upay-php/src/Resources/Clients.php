@@ -15,22 +15,12 @@ class Clients
     
     public function create(array $data): array
     {
-        // Validação de tipo e valor para name
-        if (!isset($data['name']) || !is_string($data['name'])) {
-            throw new \InvalidArgumentException('Nome do cliente é obrigatório e deve ser uma string');
-        }
-        
-        $name = trim($data['name']);
-        if (strlen($name) === 0) {
+        // Validação básica
+        if (!isset($data['name']) || !is_string($data['name']) || strlen(trim($data['name'])) === 0) {
             throw new \InvalidArgumentException('Nome do cliente é obrigatório');
         }
         
-        // Validação de tipo e valor para email
-        if (!isset($data['email']) || !is_string($data['email'])) {
-            throw new \InvalidArgumentException('Email é obrigatório e deve ser uma string');
-        }
-        
-        if (!$this->isValidEmail($data['email'])) {
+        if (!isset($data['email']) || !is_string($data['email']) || !$this->isValidEmail($data['email'])) {
             throw new \InvalidArgumentException('Email inválido');
         }
         
@@ -49,9 +39,7 @@ class Clients
     
     public function get(string $id): array
     {
-        // Validação estrita que aceita "0" como ID válido
-        // Como o parâmetro é tipado como string, apenas verificamos se está vazio após trim
-        if (trim($id) === '') {
+        if ($id === '' || trim($id) === '') {
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
@@ -61,18 +49,20 @@ class Clients
     
     public function update(string $id, array $data): array
     {
-        // Validação estrita que aceita "0" como ID válido
-        // Como o parâmetro é tipado como string, apenas verificamos se está vazio após trim
-        if (trim($id) === '') {
+        if ($id === '' || trim($id) === '') {
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
-        // Validação de tipo para email se fornecido
-        if (isset($data['email'])) {
-            if (!is_string($data['email'])) {
-                throw new \InvalidArgumentException('Email deve ser uma string');
+        // Validação de name (mesma lógica do create)
+        if (isset($data['name'])) {
+            if (!is_string($data['name']) || strlen(trim($data['name'])) === 0) {
+                throw new \InvalidArgumentException('Nome do cliente é obrigatório');
             }
-            if (!$this->isValidEmail($data['email'])) {
+        }
+        
+        // Validação de email
+        if (isset($data['email'])) {
+            if (!is_string($data['email']) || !$this->isValidEmail($data['email'])) {
                 throw new \InvalidArgumentException('Email inválido');
             }
         }

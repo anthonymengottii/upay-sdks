@@ -29,7 +29,7 @@ async function testSDK() {
   // Inicializar cliente
   const config: UpayConfig = {
     apiKey: apiKey,
-    baseUrl: process.env.UPAY_BASE_URL || 'https://https://upay-sistema-api.onrender.com/',
+    baseUrl: process.env.UPAY_BASE_URL || 'https://api.upay-sistema.onrender.com',
     version: 'v1',
     timeout: 30000,
   };
@@ -49,7 +49,7 @@ async function testSDK() {
         page: 1,
         limit: 5,
       });
-      console.log(`✅ Sucesso! Encontrados ${pagination.total ?? links.length} links`);
+      console.log(`✅ Sucesso! Encontrados ${pagination.total || links.length} links`);
       if (links.length > 0) {
         console.log(`   Primeiro link: ${links[0].title} (${links[0].slug})`);
       }
@@ -64,10 +64,11 @@ async function testSDK() {
         page: 1,
         limit: 5,
       });
-      console.log(`✅ Sucesso! Encontradas ${pagination.total ?? transactions.length} transações`);
+      console.log(`✅ Sucesso! Encontradas ${pagination.total || transactions.length} transações`);
       if (transactions.length > 0) {
         const tx = transactions[0];
-        console.log(`   Primeira transação: ${tx.product} - R$ ${(tx.amountCents / 100).toFixed(2)}`);
+        const amount = Number.isFinite(tx?.amountCents) ? (tx.amountCents / 100).toFixed(2) : 'N/A';
+        console.log(`   Primeira transação: ${tx.product} - R$ ${amount}`);
       }
     } catch (error: any) {
       console.log(`⚠️  Erro: ${error.message}`);
@@ -80,10 +81,13 @@ async function testSDK() {
         page: 1,
         limit: 5,
       });
-      console.log(`✅ Sucesso! Encontrados ${pagination.total ?? products.length} produtos`);
+      console.log(`✅ Sucesso! Encontrados ${pagination.total || products.length} produtos`);
       if (products.length > 0) {
         const product = products[0];
-        console.log(`   Primeiro produto: ${product.name} - R$ ${(product.priceCents / 100).toFixed(2)}`);
+        const price = (product && Number.isFinite(product.priceCents)) 
+          ? (product.priceCents / 100).toFixed(2) 
+          : 'N/A';
+        console.log(`   Primeiro produto: ${product.name} - R$ ${price}`);
       }
     } catch (error: any) {
       console.log(`⚠️  Erro: ${error.message}`);
@@ -96,7 +100,7 @@ async function testSDK() {
         page: 1,
         limit: 5,
       });
-      console.log(`✅ Sucesso! Encontrados ${pagination.total ?? clients.length} clientes`);
+      console.log(`✅ Sucesso! Encontrados ${pagination.total || clients.length} clientes`);
       if (clients.length > 0) {
         console.log(`   Primeiro cliente: ${clients[0].name} (${clients[0].email})`);
       }
@@ -113,14 +117,12 @@ async function testSDK() {
         amountCents: 10000,
       });
       if (validation.valid) {
-        // Computar discountCents uma única vez com verificação numérica
-        const discountCents = (typeof validation.discountCents === 'number' && Number.isFinite(validation.discountCents))
+        const discountCents = typeof validation.discountCents === 'number'
           ? validation.discountCents
           : 0;
 
-        // Emitir aviso apenas se o valor original não era numérico
-        if (typeof validation.discountCents !== 'number' || !Number.isFinite(validation.discountCents)) {
-          console.warn(`⚠️  Cupom marcado como válido, mas discountCents não veio numérico (recebido: ${validation.discountCents}). Usando ${discountCents} como fallback.`);
+        if (typeof validation.discountCents !== 'number') {
+          console.warn('⚠️  Cupom marcado como válido, mas discountCents não veio numérico. Usando 0 como fallback.');
         }
 
         console.log(`✅ Cupom válido! Desconto: R$ ${(discountCents / 100).toFixed(2)}`);

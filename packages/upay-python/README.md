@@ -191,7 +191,7 @@ from upay import UpayClient
 
 upay = UpayClient(
     api_key="sua_api_key",
-    base_url="https://upay-sistema-api.onrender.com",  # Opcional
+    base_url="https://api.upay-sistema.onrender.com",  # Opcional
     version="v1",  # Opcional
     timeout=30  # Opcional, em segundos
 )

@@ -88,8 +88,5 @@ def extract_webhook_signature(headers: Dict[str, Union[str, list, None]]) -> Opt
     if not signature_header:
         return None
     
-    # Remove prefixo "sha256=" se existir (apenas o prefixo inicial)
-    if signature_header.startswith("sha256="):
-        signature_header = signature_header[len("sha256="):]
-    
-    return signature_header
+    # Remove prefixo "sha256=" se existir
+    return signature_header.replace("sha256=", "")

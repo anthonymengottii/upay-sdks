@@ -20,18 +20,7 @@ class Products
             throw new \InvalidArgumentException('Nome do produto é obrigatório');
         }
         
-        // Validar presença de priceCents
-        if (!isset($data['priceCents'])) {
-            throw new \InvalidArgumentException('priceCents é obrigatório');
-        }
-
-        // Validar que é numérico
-        if (!is_numeric($data['priceCents'])) {
-            throw new \InvalidArgumentException('priceCents deve ser numérico');
-        }
-
-        $price = (int) $data['priceCents'];
-        if ($price < 100) {
+        if (empty($data['priceCents']) || $data['priceCents'] < 100) {
             throw new \InvalidArgumentException('Preço mínimo é R$ 1,00 (100 centavos)');
         }
         
@@ -50,42 +39,32 @@ class Products
     
     public function get(string $id): array
     {
-        if (trim($id) === '') {
+        if (empty($id)) {
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
-        $encodedId = rawurlencode($id);
-        return $this->http->get("/products/{$encodedId}");
+        return $this->http->get("/products/{$id}");
     }
     
     public function update(string $id, array $data): array
     {
-        if (trim($id) === '') {
+        if (empty($id)) {
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
-        if (isset($data['priceCents'])) {
-            if (!is_numeric($data['priceCents'])) {
-                throw new \InvalidArgumentException('priceCents deve ser numérico');
-            }
-
-            $price = (int) $data['priceCents'];
-            if ($price < 100) {
-                throw new \InvalidArgumentException('Preço mínimo é R$ 1,00 (100 centavos)');
-            }
+        if (isset($data['priceCents']) && $data['priceCents'] < 100) {
+            throw new \InvalidArgumentException('Preço mínimo é R$ 1,00 (100 centavos)');
         }
         
-        $encodedId = rawurlencode($id);
-        return $this->http->patch("/products/{$encodedId}", $data);
+        return $this->http->patch("/products/{$id}", $data);
     }
     
     public function delete(string $id): void
     {
-        if (trim($id) === '') {
+        if (empty($id)) {
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
-        $encodedId = rawurlencode($id);
-        $this->http->delete("/products/{$encodedId}");
+        $this->http->delete("/products/{$id}");
     }
 }

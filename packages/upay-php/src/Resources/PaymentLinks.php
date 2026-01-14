@@ -16,7 +16,7 @@ class PaymentLinks
     public function create(array $data): array
     {
         // Validação básica
-        if (empty($data['title']) || strlen(trim($data['title'])) < 3) {
+        if (!isset($data['title']) || !is_string($data['title']) || strlen(trim($data['title'])) < 3) {
             throw new \InvalidArgumentException('Título deve ter pelo menos 3 caracteres');
         }
         
@@ -67,7 +67,8 @@ class PaymentLinks
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
-        $response = $this->http->get("/payment-links/{$id}");
+        $encodedId = rawurlencode($id);
+        $response = $this->http->get("/payment-links/{$encodedId}");
         
         return $response['paymentLink'] ?? $response['data'] ?? $response;
     }
@@ -78,7 +79,10 @@ class PaymentLinks
             throw new \InvalidArgumentException('Slug é obrigatório');
         }
         
-        return $this->http->get("/payment-links/slug/{$slug}");
+        $encodedSlug = rawurlencode($slug);
+        $response = $this->http->get("/payment-links/slug/{$encodedSlug}");
+        
+        return $response['paymentLink'] ?? $response['data'] ?? $response;
     }
     
     public function update(string $id, array $data): array
@@ -88,15 +92,63 @@ class PaymentLinks
         }
         
         $updateData = [];
-        if (isset($data['title'])) $updateData['title'] = $data['title'];
-        if (isset($data['description'])) $updateData['description'] = $data['description'];
-        if (isset($data['amount'])) $updateData['amountCents'] = $data['amount'];
-        if (isset($data['status'])) $updateData['status'] = $data['status'];
-        if (isset($data['expiresAt'])) $updateData['expiresAt'] = $data['expiresAt'];
-        if (isset($data['redirectUrl'])) $updateData['redirectUrl'] = $data['redirectUrl'];
-        if (isset($data['settings'])) $updateData['settings'] = $data['settings'];
         
-        return $this->http->patch("/payment-links/{$id}", $updateData);
+        // Validação de title (mesma lógica do create)
+        if (isset($data['title'])) {
+            if (!is_string($data['title']) || strlen(trim($data['title'])) < 3) {
+                throw new \InvalidArgumentException('Título deve ter pelo menos 3 caracteres');
+            }
+            $updateData['title'] = $data['title'];
+        }
+        
+        // Validação de description
+        if (isset($data['description'])) {
+            if (!is_string($data['description']) || strlen($data['description']) > 5000) {
+                throw new \InvalidArgumentException('Descrição deve ser uma string com no máximo 5000 caracteres');
+            }
+            $updateData['description'] = $data['description'];
+        }
+        
+        // Validação de amountCents
+        if (isset($data['amount'])) {
+            if (!is_numeric($data['amount']) || (int)$data['amount'] < 0) {
+                throw new \InvalidArgumentException('Valor deve ser um número não negativo');
+            }
+            $amountCents = (int)$data['amount'];
+            if ($amountCents > 0 && $amountCents < 100) {
+                throw new \InvalidArgumentException('Valor mínimo é R$ 1,00 (100 centavos)');
+            }
+            $updateData['amountCents'] = $amountCents;
+        }
+        
+        // Validação de status
+        if (isset($data['status'])) {
+            $updateData['status'] = $data['status'];
+        }
+        
+        // Validação de expiresAt
+        if (isset($data['expiresAt'])) {
+            $updateData['expiresAt'] = $data['expiresAt'];
+        }
+        
+        // Validação de redirectUrl
+        if (isset($data['redirectUrl'])) {
+            if (!is_string($data['redirectUrl']) || !filter_var($data['redirectUrl'], FILTER_VALIDATE_URL)) {
+                throw new \InvalidArgumentException('redirectUrl deve ser uma URL válida');
+            }
+            $updateData['redirectUrl'] = $data['redirectUrl'];
+        }
+        
+        // Validação de settings
+        if (isset($data['settings'])) {
+            if (!is_array($data['settings'])) {
+                throw new \InvalidArgumentException('settings deve ser um array');
+            }
+            $updateData['settings'] = $data['settings'];
+        }
+        
+        $encodedId = rawurlencode($id);
+        return $this->http->patch("/payment-links/{$encodedId}", $updateData);
     }
     
     public function delete(string $id): void
@@ -105,12 +157,14 @@ class PaymentLinks
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
-        $this->http->delete("/payment-links/{$id}");
+        $encodedId = rawurlencode($id);
+        $this->http->delete("/payment-links/{$encodedId}");
     }
     
     public function getCheckoutUrl(string $slug, ?string $baseUrl = null): string
     {
         $checkoutBase = $baseUrl ?? 'https://checkout.upaybr.com';
-        return "{$checkoutBase}/{$slug}";
+        $encodedSlug = rawurlencode($slug);
+        return "{$checkoutBase}/{$encodedSlug}";
     }
 }

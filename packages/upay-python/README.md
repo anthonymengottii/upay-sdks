@@ -108,7 +108,7 @@ upay.transactions.refund(transaction_id, amount_cents=5000)
 # Criar produto
 product = upay.products.create({
     "name": "Produto Teste",
-    "priceCents": 10000,
+    "price": 10000,
     "description": "Descrição"
 })
 
@@ -119,7 +119,7 @@ products = upay.products.list(page=1, limit=10)
 product = upay.products.get(product_id)
 
 # Atualizar produto
-upay.products.update(product_id, {"priceCents": 15000})
+upay.products.update(product_id, {"price": 15000})
 
 # Deletar produto
 upay.products.delete(product_id)
@@ -191,7 +191,7 @@ from upay import UpayClient
 
 upay = UpayClient(
     api_key="sua_api_key",
-    base_url="https://api.upay-sistema.onrender.com",  # Opcional
+    base_url="https://upay-sistema-api.onrender.com",  # Opcional
     version="v1",  # Opcional
     timeout=30  # Opcional, em segundos
 )

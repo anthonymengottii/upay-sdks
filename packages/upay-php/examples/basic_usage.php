@@ -89,7 +89,7 @@ $products = $upay->products->list(['page' => 1, 'limit' => 5]);
 echo "   Total de produtos: " . ($products['pagination']['total'] ?? 0) . "\n";
 if (!empty($products['data'])) {
     $product = $products['data'][0];
-    $price = number_format($product['priceCents'] / 100, 2, ',', '.');
+    $price = number_format($product['price'] / 100, 2, ',', '.');
     echo "   Primeiro produto: {$product['name']} - R$ {$price}\n\n";
 }
 

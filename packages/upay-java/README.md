@@ -25,7 +25,7 @@ mvn compile
 import com.upay.sdk.UpayClient;
 
 String apiKey = "SUA_API_KEY_AQUI";
-String baseUrl = "https://api.upay-sistema.onrender.com"; // ou http://localhost:3001 em dev
+String baseUrl = "https://upay-sistema-api.onrender.com"; // ou http://localhost:3001 em dev
 
 UpayClient upay = new UpayClient(apiKey, baseUrl, "v1", 30);
 `

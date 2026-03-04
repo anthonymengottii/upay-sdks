@@ -18,26 +18,26 @@ public class PaymentLinksResource {
         this.http = Objects.requireNonNull(http, "HttpClientWrapper cannot be null");
     }
 
-    public JsonNode create(String title, Integer amountCents, Map<String, Object> options)
+    public JsonNode create(String title, Integer amount, Map<String, Object> options)
             throws IOException, InterruptedException {
 
         if (title == null || title.trim().length() < 3) {
             throw new IllegalArgumentException("Title must be at least 3 characters");
         }
-        if ((amountCents == null || amountCents < 100) && (options == null || !options.containsKey("products"))) {
-            throw new IllegalArgumentException("Either products must be provided or amountCents must be at least 100");
+        if ((amount == null || amount < 100) && (options == null || !options.containsKey("products"))) {
+            throw new IllegalArgumentException("Either products must be provided or amount must be at least 100");
         }
 
         Map<String, Object> body = new HashMap<>();
         body.put("title", title);
-        if (amountCents != null) {
-            body.put("amountCents", amountCents);
+        if (amount != null) {
+            body.put("amount", amount);
         }
         if (options != null) {
             // Defensive copy: only add options that don't override validated fields
             for (Map.Entry<String, Object> entry : options.entrySet()) {
                 String key = entry.getKey();
-                if (!"title".equals(key) && !"amountCents".equals(key)) {
+                if (!"title".equals(key) && !"amount".equals(key)) {
                     body.put(key, entry.getValue());
                 }
             }

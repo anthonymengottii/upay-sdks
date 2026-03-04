@@ -20,7 +20,7 @@ class Products
             throw new \InvalidArgumentException('Nome do produto é obrigatório');
         }
         
-        if (empty($data['priceCents']) || $data['priceCents'] < 100) {
+        if (empty($data['price']) || $data['price'] < 100) {
             throw new \InvalidArgumentException('Preço mínimo é R$ 1,00 (100 centavos)');
         }
         
@@ -52,7 +52,7 @@ class Products
             throw new \InvalidArgumentException('ID é obrigatório');
         }
         
-        if (isset($data['priceCents']) && $data['priceCents'] < 100) {
+        if (isset($data['price']) && $data['price'] < 100) {
             throw new \InvalidArgumentException('Preço mínimo é R$ 1,00 (100 centavos)');
         }
         

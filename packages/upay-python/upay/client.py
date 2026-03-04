@@ -43,7 +43,7 @@ class UpayClient:
         
         Args:
             api_key: Sua API key da Upay (obrigatório)
-            base_url: URL base da API (padrão: https://api.upay-sistema.onrender.com)
+            base_url: URL base da API (padrão: https://upay-sistema-api.onrender.com)
             version: Versão da API (padrão: v1)
             timeout: Timeout das requisições em segundos (padrão: 30)
             
@@ -55,7 +55,7 @@ class UpayClient:
         
         self._http = HttpClient(
             api_key=api_key,
-            base_url=base_url or "https://api.upay-sistema.onrender.com",
+            base_url=base_url or "https://upay-sistema-api.onrender.com",
             version=version,
             timeout=timeout
         )
@@ -90,7 +90,7 @@ class UpayClient:
             >>> @app.route('/webhook', methods=['POST'])
             >>> def webhook():
             ...     payload = flask.request.data
-            ...     signature = flask.request.headers.get('X-Upay-Signature')
+            ...     signature = flask.request.headers.get('x-signature')
             ...     
             ...     if upay.verify_webhook_signature(payload, signature, webhook_secret):
             ...         # Processar webhook

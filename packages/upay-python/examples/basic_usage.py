@@ -65,7 +65,7 @@ def exemplo_produtos():
     print(f"   Total de produtos: {products['pagination'].get('total', 0)}")
     if products['data']:
         product = products['data'][0]
-        print(f"   Primeiro produto: {product.get('name')} - R$ {product.get('priceCents', 0) / 100:.2f}\n")
+        print(f"   Primeiro produto: {product.get('name')} - R$ {product.get('price', 0) / 100:.2f}\n")
 
 
 def exemplo_clientes():

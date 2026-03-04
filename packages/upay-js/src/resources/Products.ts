@@ -22,11 +22,11 @@ export class ProductsResource {
       throw new Error('Nome do produto é obrigatório');
     }
 
-    if (data.priceCents == null) {
+    if (data.price == null) {
       throw new Error('Preço do produto é obrigatório');
     }
 
-    if (data.priceCents < 100) {
+    if (data.price < 100) {
       throw new Error('Preço mínimo é R$ 1,00 (100 centavos)');
     }
 
@@ -70,11 +70,11 @@ export class ProductsResource {
       throw new Error('ID é obrigatório');
     }
 
-    if (data.priceCents != null) {
-      if (typeof data.priceCents !== 'number' || !Number.isFinite(data.priceCents)) {
+    if (data.price != null) {
+      if (typeof data.price !== 'number' || !Number.isFinite(data.price)) {
         throw new Error('Preço deve ser um número válido');
       }
-      if (data.priceCents < 100) {
+      if (data.price < 100) {
         throw new Error('Preço mínimo é R$ 1,00 (100 centavos)');
       }
     }

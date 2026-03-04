@@ -31,7 +31,7 @@ class PaymentLinks
         $requestData = [
             'title' => $data['title'],
             'description' => $data['description'] ?? null,
-            'amountCents' => $data['amount'] ?? null,
+            'amount' => $data['amount'] ?? null,
             'products' => $data['products'] ?? null,
             'currency' => $data['currency'] ?? 'BRL',
             'expiresAt' => $data['expiresAt'] ?? null,
@@ -118,7 +118,7 @@ class PaymentLinks
             if ($amountCents > 0 && $amountCents < 100) {
                 throw new \InvalidArgumentException('Valor mínimo é R$ 1,00 (100 centavos)');
             }
-            $updateData['amountCents'] = $amountCents;
+            $updateData['amount'] = $amountCents;
         }
         
         // Validação de status

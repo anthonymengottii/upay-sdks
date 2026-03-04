@@ -35,7 +35,7 @@ export class PaymentLinksResource {
     const response = await this.http.post<any>('/payment-links', {
       title: title,
       description: data.description,
-      amountCents: data.amount,
+      amount: data.amount,
       products: data.products,
       currency: data.currency || 'BRL',
       expiresAt: data.expiresAt,
@@ -106,7 +106,7 @@ export class PaymentLinksResource {
     const updateData: any = {};
     if (data.title !== undefined) updateData.title = data.title;
     if (data.description !== undefined) updateData.description = data.description;
-    if (data.amount !== undefined) updateData.amountCents = data.amount;
+    if (data.amount !== undefined) updateData.amount = data.amount;
     if (data.status !== undefined) updateData.status = data.status;
     if (data.expiresAt !== undefined) updateData.expiresAt = data.expiresAt;
     if (data.redirectUrl !== undefined) updateData.redirectUrl = data.redirectUrl;

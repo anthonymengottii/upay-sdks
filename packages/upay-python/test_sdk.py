@@ -66,7 +66,7 @@ def test_sdk():
             print(f"[OK] Sucesso! Encontrados {total} produtos")
             if products['data']:
                 product = products['data'][0]
-                price = product.get('priceCents', 0) / 100
+                price = product.get('price', 0) / 100
                 print(f"   Primeiro produto: {product.get('name')} - R$ {price:.2f}")
         except Exception as e:
             print(f"[ERRO] Erro: {e}")

@@ -45,7 +45,7 @@ class PaymentLinksResource:
         request_data = {
             "title": data["title"],
             "description": data.get("description"),
-            "amountCents": data.get("amount"),
+            "amount": data.get("amount"),
             "products": data.get("products"),
             "currency": data.get("currency", "BRL"),
             "expiresAt": data.get("expiresAt"),
@@ -159,7 +159,7 @@ class PaymentLinksResource:
         if "description" in data:
             update_data["description"] = data["description"]
         if "amount" in data:
-            update_data["amountCents"] = data["amount"]
+            update_data["amount"] = data["amount"]
         if "status" in data:
             update_data["status"] = data["status"]
         if "expiresAt" in data:

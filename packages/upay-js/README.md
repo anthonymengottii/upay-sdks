@@ -22,7 +22,7 @@ import UpayClient from '@upay/upay-js';
 const upay = new UpayClient({
   apiKey: 'sua_api_key_aqui',
   // Opcional: customizar URL base
-  // baseUrl: 'https://api.upay-sistema.onrender.com',
+  // baseUrl: 'https://upay-sistema-api.onrender.com',
   // version: 'v1',
 });
 ```
@@ -89,7 +89,7 @@ transactions.forEach(tx => {
 const product = await upay.products.create({
   name: 'Produto Exemplo',
   description: 'Descrição do produto',
-  priceCents: 5000, // R$ 50,00
+  price: 5000, // R$ 50,00
   stock: 100,
   sku: 'PROD-001',
 });
@@ -99,7 +99,7 @@ const { data: products } = await upay.products.list();
 
 // Atualizar produto
 await upay.products.update(product.id, {
-  priceCents: 4500, // R$ 45,00
+  price: 4500, // R$ 45,00
   stock: 95,
 });
 ```
@@ -213,7 +213,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
 ```typescript
 const upay = new UpayClient({
   apiKey: 'sua_api_key',        // Obrigatório
-  baseUrl: 'https://...',        // Opcional (padrão: https://api.upay-sistema.onrender.com)
+  baseUrl: 'https://...',        // Opcional (padrão: https://upay-sistema-api.onrender.com)
   version: 'v1',                 // Opcional (padrão: 'v1')
   timeout: 30000,               // Opcional (padrão: 30000ms)
 });

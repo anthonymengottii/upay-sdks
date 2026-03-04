@@ -13,9 +13,9 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "5.0",
     "allowSyntheticDefaultImports": true,
-    "ignoreDeprecations": "6.0",
-    "noUnusedLocals": true,
+"noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true

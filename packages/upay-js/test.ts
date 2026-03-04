@@ -29,7 +29,7 @@ async function testSDK() {
   // Inicializar cliente
   const config: UpayConfig = {
     apiKey: apiKey,
-    baseUrl: process.env.UPAY_BASE_URL || 'https://api.upay-sistema.onrender.com',
+    baseUrl: process.env.UPAY_BASE_URL || 'https://upay-sistema-api.onrender.com',
     version: 'v1',
     timeout: 30000,
   };
@@ -84,8 +84,8 @@ async function testSDK() {
       console.log(`✅ Sucesso! Encontrados ${pagination.total || products.length} produtos`);
       if (products.length > 0) {
         const product = products[0];
-        const price = (product && Number.isFinite(product.priceCents)) 
-          ? (product.priceCents / 100).toFixed(2) 
+        const price = (product && Number.isFinite(product.price))
+          ? (product.price / 100).toFixed(2)
           : 'N/A';
         console.log(`   Primeiro produto: ${product.name} - R$ ${price}`);
       }

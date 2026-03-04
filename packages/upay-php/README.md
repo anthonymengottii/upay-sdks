@@ -122,7 +122,7 @@ $upay->transactions->refund($transactionId, amountCents: 5000);
 // Criar produto
 $product = $upay->products->create([
     'name' => 'Produto Teste',
-    'priceCents' => 10000,
+    'price' => 10000,
     'description' => 'Descrição'
 ]);
 
@@ -133,7 +133,7 @@ $products = $upay->products->list(['page' => 1, 'limit' => 10]);
 $product = $upay->products->get($productId);
 
 // Atualizar produto
-$upay->products->update($productId, ['priceCents' => 15000]);
+$upay->products->update($productId, ['price' => 15000]);
 
 // Deletar produto
 $upay->products->delete($productId);
@@ -202,7 +202,7 @@ if ($upay->verifyWebhookSignature($payload, $signature, $secret)) {
 ```php
 $upay = new UpayClient(
     apiKey: "sua_api_key",
-    baseUrl: "https://api.upay-sistema.onrender.com",  // Opcional
+    baseUrl: "https://upay-sistema-api.onrender.com",  // Opcional
     version: "v1",  // Opcional
     timeout: 30  // Opcional, em segundos
 );

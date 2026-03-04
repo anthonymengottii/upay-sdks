@@ -34,7 +34,7 @@ interface BaseCreatePaymentLinkRequest {
 }
 
 export interface CreatePaymentLinkWithAmountRequest extends BaseCreatePaymentLinkRequest {
-  /** amount: integer amount in cents (e.g., 10000 = R$ 100,00). This is converted to amountCents in the API request. */
+  /** Valor em centavos inteiros (ex: 10000 = R$ 100,00) */
   amount: number;
   products?: never;
 }
@@ -54,7 +54,7 @@ export type CreatePaymentLinkRequest =
 export interface UpdatePaymentLinkRequest {
   title?: string;
   description?: string;
-  /** amount: integer amount in cents (e.g., 10000 = R$ 100,00). This is converted to amountCents in the API request. */
+  /** Valor em centavos inteiros (ex: 10000 = R$ 100,00) */
   amount?: number;
   status?: 'ACTIVE' | 'INACTIVE';
   expiresAt?: Date | string;
@@ -67,10 +67,8 @@ export interface PaymentLink {
   slug: string;
   title: string;
   description?: string;
-  /** @deprecated Use amountCents instead. This field is kept for backward compatibility. */
+  /** Valor em centavos inteiros (ex: 10000 = R$ 100,00) */
   amount: number;
-  /** amountCents: integer amount in cents (e.g., 10000 = R$ 100,00) */
-  amountCents: number;
   currency: string;
   status: 'ACTIVE' | 'INACTIVE';
   expiresAt?: string;
@@ -84,7 +82,7 @@ export interface PaymentLink {
     product: {
       id: string;
       name: string;
-      priceCents: number;
+      price: number;
     };
   }>;
 }
@@ -137,8 +135,9 @@ export interface Transaction {
 export interface CreateProductRequest {
   name: string;
   description?: string;
-  priceCents: number;
-  stock?: number;
+  price: number;
+  stockQuantity?: number;
+  stockEnabled?: boolean;
   imageUrl?: string;
   sku?: string;
   category?: string;
@@ -148,8 +147,9 @@ export interface Product {
   id: string;
   name: string;
   description?: string;
-  priceCents: number;
-  stock?: number;
+  price: number;
+  stockQuantity?: number;
+  stockEnabled?: boolean;
   imageUrl?: string;
   sku?: string;
   category?: string;

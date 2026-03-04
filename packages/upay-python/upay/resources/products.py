@@ -19,7 +19,7 @@ class ProductsResource:
         Args:
             data: Dados do produto
                 - name: Nome do produto (obrigatório)
-                - priceCents: Preço em centavos (obrigatório, min 100)
+                - price: Preço em centavos (obrigatório, min 100)
                 - description: Descrição do produto
                 - imageUrl: URL da imagem
                 - stockQuantity: Quantidade em estoque
@@ -31,7 +31,7 @@ class ProductsResource:
         if not data.get("name") or len(str(data["name"]).strip()) == 0:
             raise ValueError("Nome do produto é obrigatório")
         
-        if not data.get("priceCents") or data.get("priceCents", 0) < 100:
+        if not data.get("price") or data.get("price", 0) < 100:
             raise ValueError("Preço mínimo é R$ 1,00 (100 centavos)")
         
         return self.http.post("/products", data)
@@ -102,7 +102,7 @@ class ProductsResource:
         if not product_id:
             raise ValueError("ID é obrigatório")
         
-        if data.get("priceCents") is not None and data.get("priceCents", 0) < 100:
+        if data.get("price") is not None and data.get("price", 0) < 100:
             raise ValueError("Preço mínimo é R$ 1,00 (100 centavos)")
         
         return self.http.patch(f"/products/{product_id}", data)
